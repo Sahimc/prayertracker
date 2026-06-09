@@ -119,7 +119,6 @@ export default function Dashboard() {
                 onClick={() => togglePrayer(todayDateStr, prayer)}
               >
                 <div className={styles.prayerName}>{prayer}</div>
-                <div className={styles.statusIcon}>{isPrayed ? '✓' : ''}</div>
                 <div className={styles.rakaatPill}>{rakaatMap[prayer]}</div>
               </button>
             );
