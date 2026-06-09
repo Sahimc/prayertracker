@@ -189,7 +189,7 @@ export default function AdminDashboard() {
                           title={`${prayer} on ${dateStr}`}
                           onClick={() => togglePrayer(student.id, dateStr, prayer, isPrayed)}
                         >
-                          {prayer[0].toUpperCase()}
+                          {prayer.charAt(0).toUpperCase() + prayer.slice(1)}
                           {isMissed && <span className={styles.missedPill}>Missed</span>}
                         </button>
                       );

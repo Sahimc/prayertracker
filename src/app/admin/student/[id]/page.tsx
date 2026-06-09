@@ -83,7 +83,7 @@ export default function StudentDetail({ params }: { params: Promise<{ id: string
                   key={prayer} 
                   className={`${styles.prayerPill} ${log[prayer] ? styles.prayed : (isFuture ? styles.future : styles.missed)}`}
                 >
-                  {prayer}
+                  {prayer.charAt(0).toUpperCase() + prayer.slice(1)}
                   {isMissed && <span className={styles.missedPill}>Missed</span>}
                 </div>
                 );

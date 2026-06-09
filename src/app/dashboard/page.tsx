@@ -118,7 +118,7 @@ export default function Dashboard() {
                 className={`${styles.bigPrayerBtn} ${isPrayed ? styles.prayed : ""}`}
                 onClick={() => togglePrayer(todayDateStr, prayer)}
               >
-                <div className={styles.prayerName}>{prayer}</div>
+                <div className={styles.prayerName}>{prayer.charAt(0).toUpperCase() + prayer.slice(1)}</div>
                 <div className={styles.rakaatPill}>{rakaatMap[prayer]}</div>
               </button>
             );
@@ -156,7 +156,7 @@ export default function Dashboard() {
                     title={`${prayer} on ${dateStr}`}
                     onClick={() => togglePrayer(dateStr, prayer)}
                   >
-                    {prayer[0].toUpperCase()}
+                    {prayer.charAt(0).toUpperCase() + prayer.slice(1)}
                     {isMissed && <span className={styles.missedPill}>Missed</span>}
                   </button>
                 );
