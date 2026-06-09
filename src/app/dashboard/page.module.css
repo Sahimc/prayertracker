@@ -99,6 +99,48 @@
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
 }
 
+.infoCard {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--border-radius-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.infoTitle {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.infoCard p {
+  margin-bottom: 0.75rem;
+}
+
+.infoCard p:last-child {
+  margin-bottom: 0;
+}
+
+.infoList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.infoList li {
+  font-size: 0.9rem;
+}
+
 .weekCard {
   padding: 2rem;
 }
