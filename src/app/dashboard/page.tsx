@@ -126,25 +126,9 @@ export default function Dashboard() {
         </div>
         <div className={styles.prayersGrid} style={{marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--glass-border)'}}>
           <div style={{fontSize: '1.2rem', color: 'var(--text-secondary)'}}>
-            Total Score: <strong style={{color: 'var(--accent-warning)', fontSize: '2rem'}}>{totalPoints} pts</strong>
+            Lifetime Score: <strong style={{color: 'var(--accent-warning)', fontSize: '2rem'}}>{totalPoints} pts</strong>
           </div>
         </div>
-      </div>
-
-      <div className={`glass-panel ${styles.infoCard}`}>
-        <h3 className={styles.infoTitle}>Prayer Guide</h3>
-        <p>Each prayer earns 30 points.</p>
-        <p>You must pray at least the Fardh:</p>
-        <ul className={styles.infoList}>
-          <li><strong>Fajr:</strong> 2 rakaats</li>
-          <li><strong>Dhuhr:</strong> 4 rakaats</li>
-          <li><strong>Asr:</strong> 4 rakaats</li>
-          <li><strong>Maghrib:</strong> 3 rakaats</li>
-          <li><strong>Isha:</strong> 4 rakaats</li>
-        </ul>
-        <p>If you miss or forget a prayer, pray it as soon as you remember — even if the next prayer time has started or you overslept.</p>
-        <p>Even if you missed 2 or 3 prayers in a row, pray them all straight away on the same day.</p>
-        <p>As long as you pray the prayers, you can mark them as prayed and get your points.</p>
       </div>
 
       <div className={`glass-panel ${styles.weekCard}`}>
@@ -181,6 +165,22 @@ export default function Dashboard() {
             );
           })}
         </div>
+      </div>
+
+      <div className={`glass-panel ${styles.infoCard}`}>
+        <h3 className={styles.infoTitle}>Prayer Guide</h3>
+        <p>Each prayer earns 30 points.</p>
+        <p>You must pray at least the Fardh:</p>
+        <ul className={styles.infoList}>
+          <li><strong>Fajr:</strong> 2 rakaats</li>
+          <li><strong>Dhuhr:</strong> 4 rakaats</li>
+          <li><strong>Asr:</strong> 4 rakaats</li>
+          <li><strong>Maghrib:</strong> 3 rakaats</li>
+          <li><strong>Isha:</strong> 4 rakaats</li>
+        </ul>
+        <p><strong>If you miss or forget a prayer, pray it as soon as you remember — even if the next prayer time has started or you overslept.</strong></p>
+        <p><strong>Even if you missed 2 or 3 prayers in a row, pray them all straight away on the same day.</strong></p>
+        <p><strong>As long as you pray the prayers, you can mark them as prayed and get your points.</strong></p>
       </div>
     </div>
   );
