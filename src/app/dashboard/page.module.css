@@ -1,0 +1,179 @@
+.container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.todayCard {
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.prayersGrid {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.bigPrayerBtn {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  position: relative;
+}
+
+.rakaatPill {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  background-color: #f59e0b; /* Amber */
+  color: #111; /* Dark text */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border: 2px solid #111;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.bigPrayerBtn.prayed {
+  background: var(--gradient-success);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+}
+
+.bigPrayerBtn:not(.prayed):hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+.bigPrayerBtn.prayed:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.weekCard {
+  padding: 2rem;
+}
+
+.weekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1rem;
+  overflow-x: auto;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  min-width: 60px;
+}
+
+.dayName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.smallPrayerBtn {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--border-radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.smallPrayerBtn.missed {
+  border-color: #991b1b;
+  background-color: #dc2626;
+  color: white;
+}
+
+.smallPrayerBtn.future {
+  background: rgba(100, 116, 139, 0.2);
+  border-color: transparent;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.missedPill {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #7f1d1d;
+  color: white;
+  font-size: 0.5rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.smallPrayerBtn.prayed {
+  background: var(--accent-success);
+  color: white;
+  border-color: var(--accent-success);
+}
+
+.smallPrayerBtn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
