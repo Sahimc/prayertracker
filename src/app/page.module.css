@@ -97,6 +97,8 @@
   font-weight: 600;
   font-size: 1.1rem;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  display: block;
+  text-align: center;
 }
 
 .submitBtn:hover {
@@ -113,4 +115,82 @@
   font-size: 0.9rem;
   text-align: center;
   margin-top: 0.5rem;
+}
+
+.muted {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.mosqueTitle {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin-top: 0.75rem;
+}
+
+.mosqueList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.mosqueItem {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: var(--border-radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mosqueItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.mosqueItem span {
+  font-weight: 600;
+}
+
+.mosqueItem small {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.secondaryLink {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.secondaryLink:hover {
+  color: var(--text-primary);
+}
+
+.linkStack {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 520px) {
+  .container {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .loginCard {
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
 }

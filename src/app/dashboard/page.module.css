@@ -15,6 +15,12 @@
   font-size: 2rem;
 }
 
+.mosqueMeta {
+  color: var(--text-secondary);
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+}
+
 .logoutBtn {
   background: rgba(255, 255, 255, 0.1);
   color: white;
@@ -38,11 +44,26 @@
   color: var(--text-secondary);
 }
 
+.todayDate {
+  color: var(--text-secondary);
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
 .prayersGrid {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
   flex-wrap: wrap;
+}
+
+.prayerButtonShell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 118px;
 }
 
 .bigPrayerBtn {
@@ -99,6 +120,45 @@
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
 }
 
+.timePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.14);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #bfdbfe;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.timeMissing {
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: var(--accent-danger);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.scoreRow {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--glass-border);
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.scoreRow strong {
+  color: var(--accent-warning);
+  font-size: 2rem;
+}
+
 .infoCard {
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -146,6 +206,27 @@
   margin-bottom: 2rem;
 }
 
+.weekHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.weekHeader .sectionTitle {
+  margin-bottom: 0;
+}
+
+.historyLink {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
 .weekGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -167,6 +248,11 @@
   color: var(--text-secondary);
   margin-bottom: 0.5rem;
   text-align: center;
+}
+
+.dayName span {
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
 
 .smallPrayerBtn {
@@ -219,4 +305,69 @@
 .smallPrayerBtn:hover {
   filter: brightness(1.2);
   transform: scale(1.05);
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .todayCard,
+  .weekCard,
+  .infoCard {
+    padding: 1.25rem;
+  }
+
+  .prayersGrid {
+    gap: 1.25rem 0.75rem;
+  }
+
+  .bigPrayerBtn {
+    width: 94px;
+    height: 94px;
+    font-size: 0.95rem;
+  }
+
+  .prayerButtonShell {
+    min-width: 100px;
+  }
+
+  .timePill {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .weekHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .weekGrid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.35rem;
+    overflow-x: visible;
+  }
+
+  .dayColumn {
+    min-width: 0;
+    gap: 0.45rem;
+  }
+
+  .dayName {
+    font-size: 0.72rem;
+  }
+
+  .dayName span {
+    font-size: 0.62rem;
+  }
+
+  .smallPrayerBtn {
+    font-size: 0.58rem;
+    padding: 0.45rem 0.1rem;
+  }
 }

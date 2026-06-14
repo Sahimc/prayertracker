@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prayer Tracker
 
-## Getting Started
+A simple mobile-first prayer tracker for children, mosque classes, madrasahs, families, and community organisations.
 
-First, run the development server:
+The app is organized by mosque URL slug. Students and admins do not use email, passwords, PINs, or mosque codes.
+
+## Local Setup
 
 ```bash
+npm install
+npm run prisma:generate
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The app uses Prisma with PostgreSQL.
 
-## Learn More
+Required environment variables:
 
-To learn more about Next.js, take a look at the following resources:
+- `POSTGRES_PRISMA_URL`
+- `DATABASE_URL_UNPOOLED`
+- `SESSION_SECRET` for production session signing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For local/dev only, reset with:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run db:reset:dev
+npm run prisma:generate
+npm run db:seed
+```
 
-## Deploy on Vercel
+Do not run the reset command against production, hosted, or real-user data. This repo currently contains Vercel/Postgres-style environment variables, so confirm the target database is local/dev before resetting.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Main Routes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/` choose mosque
+- `/create-mosque` create a mosque and first admin
+- `/m/[mosqueSlug]` student login
+- `/m/[mosqueSlug]/dashboard` student dashboard
+- `/m/[mosqueSlug]/dashboard/history` student history
+- `/m/[mosqueSlug]/admin` admin login
+- `/m/[mosqueSlug]/admin/dashboard` admin dashboard
+- `/m/[mosqueSlug]/admin/student/[studentId]` admin student history/details
+
+Legacy `/dashboard`, `/dashboard/history`, `/admin`, and `/admin/student/[id]` redirect to the scoped route when a valid session exists.
+
+## Seeded Logins
+
+Seed data creates two mosques.
+
+Green Lane Masjid (East Ham), slug `green-lane-masjid`:
+
+- Admin: `Aisha`, DOB `01/02/1990`
+- Student: `Abdullah`, DOB `01/02/2020`
+- Student: `Maryam`, DOB `15/05/2019`
+- Student: `Yusuf`, DOB `22/08/2018`
+
+Masjid Umar (Luton), slug `masjid-umar`:
+
+- Admin: `Omar`, DOB `05/06/1988`
+- Student: `Abdullah`, DOB `01/02/2020`
+- Student: `Safiya`, DOB `09/11/2019`
+- Student: `Ibrahim`, DOB `17/03/2018`
+
+All DOB entry in the UI is UK format `DD/MM/YYYY`. The database stores DOB values as normalized `YYYY-MM-DD`.
+
+## Security Model
+
+Login creates an HTTP-only signed session cookie containing role, organization, mosque slug, user id, and expiry.
+
+Protected API routes verify the cookie on every request:
+
+- no session returns `401`
+- wrong role returns `403`
+- wrong mosque/session mismatch returns `403`
+- missing scoped resources return `404`
+
+Students can only access their own record and prayer logs. Admins can only access students, prayer logs, and prayer times inside their own mosque.
+
+## Prayer Times
+
+Each mosque can store one set of prayer times per date using `HH:mm`. Admins can edit today's prayer times from the admin dashboard. The student dashboard displays them as small readable pills below the existing prayer buttons.
+
+## Checks
+
+```bash
+npx prisma validate
+npx prisma generate
+npx tsc --noEmit
+npm run lint
+npm run build
+```
