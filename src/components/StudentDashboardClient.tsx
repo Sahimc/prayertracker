@@ -150,7 +150,7 @@ export function StudentDashboardClient({
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1 className={`text-gradient ${styles.title}`}>Hello, {firstName}</h1>
+          <h1 className={`text-gradient ${styles.title}`}>Salaam, {firstName}</h1>
           <p className={styles.mosqueMeta}>
             {organization.name} · {organization.town}
           </p>
