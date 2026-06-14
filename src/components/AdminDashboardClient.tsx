@@ -580,7 +580,9 @@ export function AdminDashboardClient({
 
           <div className={`glass-panel ${styles.card}`}>
             <h2 className={styles.cardTitle}>Today&apos;s Prayer Times</h2>
-            <p className={styles.helperText}>Calculated by AlAdhan from your selected location and method.</p>
+            <p className={styles.helperText}>
+              Calculated by AlAdhan. Saved times below are shown to students immediately.
+            </p>
             <form className={styles.form} onSubmit={handlePrayerSettingsSubmit}>
               <input
                 type="text"
@@ -656,12 +658,16 @@ export function AdminDashboardClient({
               </button>
             </form>
             {prayerTime && (
-              <div className={styles.prayerTimesPreview}>
-                {PRAYERS.map((prayer) => (
-                  <span key={prayer}>
-                    {PRAYER_LABELS[prayer]} {formatPrayerTime(prayerTime[prayer])}
-                  </span>
-                ))}
+              <div className={styles.prayerTimesPreview} aria-label="Prayer times shown to students">
+                <div className={styles.previewTitle}>Showing to students now</div>
+                <div className={styles.previewGrid}>
+                  {PRAYERS.map((prayer) => (
+                    <span key={prayer}>
+                      <strong>{PRAYER_LABELS[prayer]}</strong>
+                      {formatPrayerTime(prayerTime[prayer])}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>

@@ -25,6 +25,33 @@ type PrayerResponse = {
   error?: string;
 };
 
+function getMinutesFromTime(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const [hourValue, minuteValue] = value.split(":");
+  const hour = Number(hourValue);
+  const minute = Number(minuteValue);
+  if (!Number.isInteger(hour) || !Number.isInteger(minute)) return null;
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+  return hour * 60 + minute;
+}
+
+function getCurrentPrayer(prayerTime: PrayerTimeSummary | null): (typeof PRAYERS)[number] | null {
+  if (!prayerTime) return null;
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  let currentPrayer: (typeof PRAYERS)[number] | null = null;
+
+  for (const prayer of PRAYERS) {
+    const prayerMinutes = getMinutesFromTime(prayerTime[prayer]);
+    if (prayerMinutes !== null && prayerMinutes <= currentMinutes) {
+      currentPrayer = prayer;
+    }
+  }
+
+  return currentPrayer ?? "isha";
+}
+
 export function StudentDashboardClient({
   organization,
   initialStudent,
@@ -117,6 +144,7 @@ export function StudentDashboardClient({
 
   const totalPoints = calculatePointsFromLogs(student.prayers);
   const firstName = student.fullName.split(" ")[0] || student.fullName;
+  const currentPrayer = getCurrentPrayer(initialPrayerTime);
 
   return (
     <div className={styles.container}>
@@ -139,16 +167,28 @@ export function StudentDashboardClient({
           {PRAYERS.map((prayer) => {
             const isPrayed = getPrayerStatus(todayDateStr, prayer);
             const prayerTime = initialPrayerTime ? formatPrayerTime(initialPrayerTime[prayer]) : "";
+            const isCurrentPrayer = currentPrayer === prayer;
             return (
-              <div key={prayer} className={styles.prayerButtonShell}>
+              <div
+                key={prayer}
+                className={`${styles.prayerButtonShell} ${isCurrentPrayer ? styles.currentPrayerShell : ""}`}
+              >
                 <button
-                  className={`${styles.bigPrayerBtn} ${isPrayed ? styles.prayed : ""}`}
+                  className={`${styles.bigPrayerBtn} ${isPrayed ? styles.prayed : ""} ${
+                    isCurrentPrayer ? styles.currentPrayer : ""
+                  }`}
                   onClick={() => togglePrayer(todayDateStr, prayer)}
+                  aria-label={`${PRAYER_LABELS[prayer]}${isCurrentPrayer ? " current prayer" : ""}`}
                 >
                   <div className={styles.prayerName}>{PRAYER_LABELS[prayer]}</div>
                   <div className={styles.rakaatPill}>{RAKAAT_MAP[prayer]}</div>
                 </button>
-                {prayerTime && <span className={styles.timePill}>{prayerTime}</span>}
+                {prayerTime && (
+                  <span className={`${styles.timePill} ${isCurrentPrayer ? styles.currentTimePill : ""}`}>
+                    {isCurrentPrayer && <span className={styles.nowLabel}>Now</span>}
+                    {prayerTime}
+                  </span>
+                )}
               </div>
             );
           })}
