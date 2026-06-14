@@ -16,7 +16,18 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
   const { mosqueSlug } = await params;
   const organization = await prisma.organization.findUnique({
     where: { slug: mosqueSlug },
-    select: { id: true, name: true, town: true, slug: true },
+    select: {
+      id: true,
+      name: true,
+      town: true,
+      slug: true,
+      prayerCity: true,
+      prayerCountry: true,
+      prayerTimezone: true,
+      prayerCalculationMethod: true,
+      prayerSchool: true,
+      prayerLatitudeAdjustmentMethod: true,
+    },
   });
 
   if (!organization) {
@@ -38,7 +49,7 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
     redirect(`/m/${mosqueSlug}/admin`);
   }
 
-  const [students, prayerTime] = await Promise.all([
+  const [students, admins, prayerTime] = await Promise.all([
     prisma.student.findMany({
       where: { organizationId: organization.id },
       select: {
@@ -60,6 +71,16 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
           },
           orderBy: { date: "desc" },
         },
+      },
+      orderBy: { fullName: "asc" },
+    }),
+    prisma.admin.findMany({
+      where: { organizationId: organization.id },
+      select: {
+        id: true,
+        organizationId: true,
+        fullName: true,
+        dateOfBirth: true,
       },
       orderBy: { fullName: "asc" },
     }),
@@ -86,7 +107,16 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
   return (
     <AdminDashboardClient
       organization={organization}
+      initialPrayerSettings={{
+        city: organization.prayerCity,
+        country: organization.prayerCountry,
+        timezone: organization.prayerTimezone,
+        method: organization.prayerCalculationMethod,
+        school: organization.prayerSchool,
+        latitudeAdjustmentMethod: organization.prayerLatitudeAdjustmentMethod,
+      }}
       initialStudents={students}
+      initialAdmins={admins}
       initialPrayerTime={prayerTime}
       mosqueSlug={mosqueSlug}
     />

@@ -148,7 +148,7 @@ export function StudentDashboardClient({
                   <div className={styles.prayerName}>{PRAYER_LABELS[prayer]}</div>
                   <div className={styles.rakaatPill}>{RAKAAT_MAP[prayer]}</div>
                 </button>
-                {prayerTime && <span className={styles.timePill}>Mosque time: {prayerTime}</span>}
+                {prayerTime && <span className={styles.timePill}>{prayerTime}</span>}
               </div>
             );
           })}

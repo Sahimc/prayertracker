@@ -1,0 +1,7 @@
+ALTER TABLE "Organization"
+ADD COLUMN "prayerCity" TEXT NOT NULL DEFAULT 'London',
+ADD COLUMN "prayerCountry" TEXT NOT NULL DEFAULT 'GB',
+ADD COLUMN "prayerTimezone" TEXT NOT NULL DEFAULT 'Europe/London',
+ADD COLUMN "prayerCalculationMethod" INTEGER NOT NULL DEFAULT 3,
+ADD COLUMN "prayerSchool" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "prayerLatitudeAdjustmentMethod" INTEGER NOT NULL DEFAULT 3;

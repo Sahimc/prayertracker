@@ -82,7 +82,7 @@ Students can only access their own record and prayer logs. Admins can only acces
 
 ## Prayer Times
 
-Each mosque can store one set of prayer times per date using `HH:mm`. Admins can edit today's prayer times from the admin dashboard. The student dashboard displays them as small readable pills below the existing prayer buttons.
+Each mosque stores prayer calculation settings for AlAdhan: city, country, timezone, calculation method, school, and high-latitude adjustment. Admins choose these settings from the admin dashboard. The app fetches today's Fajr, Dhuhr, Asr, Maghrib, and Isha times from AlAdhan, saves the calculated snapshot, and displays it to students as 12-hour AM/PM pills below the existing prayer buttons.
 
 ## Checks
 

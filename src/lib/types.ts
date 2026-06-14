@@ -9,6 +9,15 @@ export type OrganizationSummary = {
   slug: string;
 };
 
+export type PrayerSettingsSummary = {
+  city: string;
+  country: string;
+  timezone: string;
+  method: number;
+  school: number;
+  latitudeAdjustmentMethod: number;
+};
+
 export type PrayerLogSummary = {
   id: string;
   studentId: string;
@@ -38,6 +47,13 @@ export type StudentSummary = {
   fullName: string;
   dateOfBirth: string;
   prayers: PrayerLogSummary[];
+};
+
+export type AdminSummary = {
+  id: string;
+  organizationId: string;
+  fullName: string;
+  dateOfBirth: string;
 };
 
 export type StudentWithStats = StudentSummary & {

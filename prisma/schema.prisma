@@ -9,16 +9,22 @@ datasource db {
 }
 
 model Organization {
-  id          String       @id @default(cuid())
-  name        String
-  town        String
-  slug        String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  admins      Admin[]
-  students    Student[]
-  prayerLogs  PrayerLog[]
-  prayerTimes PrayerTime[]
+  id                             String       @id @default(cuid())
+  name                           String
+  town                           String
+  slug                           String       @unique
+  prayerCity                     String       @default("London")
+  prayerCountry                  String       @default("GB")
+  prayerTimezone                 String       @default("Europe/London")
+  prayerCalculationMethod        Int          @default(3)
+  prayerSchool                   Int          @default(0)
+  prayerLatitudeAdjustmentMethod Int          @default(3)
+  createdAt                      DateTime     @default(now())
+  updatedAt                      DateTime     @updatedAt
+  admins                         Admin[]
+  students                       Student[]
+  prayerLogs                     PrayerLog[]
+  prayerTimes                    PrayerTime[]
 }
 
 model Admin {

@@ -125,5 +125,5 @@ export function formatPrayerTime(value: string | null | undefined): string {
   const hour = Number(hourValue);
   const period = hour >= 12 ? "PM" : "AM";
   const displayHour = hour % 12 || 12;
-  return `${displayHour}:${minute} ${period}`;
+  return `${String(displayHour).padStart(2, "0")}:${minute} ${period}`;
 }
