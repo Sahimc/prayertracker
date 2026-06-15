@@ -102,6 +102,7 @@ export function AdminDashboardClient({
   const [prayerTime, setPrayerTime] = useState(initialPrayerTime);
   const [prayerSettings, setPrayerSettings] = useState<PrayerSettingsSummary>(initialPrayerSettings);
   const [prayerSettingsLoading, setPrayerSettingsLoading] = useState(false);
+  const [showDailyReminder, setShowDailyReminder] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const newDateInputRef = useRef<HTMLInputElement>(null);
@@ -397,6 +398,27 @@ export function AdminDashboardClient({
 
   return (
     <div className={styles.container}>
+      {showDailyReminder && (
+        <div className={styles.modalOverlay} role="presentation">
+          <div
+            className={styles.reminderModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="daily-prayer-reminder-title"
+          >
+            <p className={styles.modalEyebrow}>Daily teacher reminder</p>
+            <h2 id="daily-prayer-reminder-title">Check in with every student today</h2>
+            <p>
+              Teachers and admins should ask students about their daily prayers, encourage them kindly, and remind
+              them never to miss prayers on purpose.
+            </p>
+            <button className={styles.submitBtn} onClick={() => setShowDailyReminder(false)}>
+              I understand
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className={styles.header}>
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Admin Dashboard</h1>
@@ -441,6 +463,17 @@ export function AdminDashboardClient({
             </span>
           ))}
         </div>
+      </div>
+
+      <div className={`glass-panel ${styles.teacherReminderCard}`}>
+        <div>
+          <p className={styles.reminderEyebrow}>Daily teacher reminder</p>
+          <h2>Check prayers with your students</h2>
+        </div>
+        <p>
+          Admins and teachers should check daily with students about their prayers, encourage them with care, and
+          remind them never to miss prayers on purpose.
+        </p>
       </div>
 
       <div className={styles.grid}>

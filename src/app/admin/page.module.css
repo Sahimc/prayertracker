@@ -59,6 +59,74 @@
   margin-bottom: 1.5rem;
 }
 
+.teacherReminderCard {
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr);
+  gap: 1rem;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.12)),
+    var(--glass-bg);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+.teacherReminderCard h2 {
+  font-size: 1.2rem;
+  margin-top: 0.25rem;
+}
+
+.teacherReminderCard p {
+  color: #dbeafe;
+  line-height: 1.55;
+}
+
+.reminderEyebrow,
+.modalEyebrow {
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.reminderModal {
+  width: min(100%, 440px);
+  padding: 1.5rem;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: var(--border-radius-md);
+  background:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.28), transparent 55%),
+    rgba(15, 23, 42, 0.96);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.reminderModal h2 {
+  margin-top: 0.4rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.45rem;
+}
+
+.reminderModal p {
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+}
+
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -426,9 +494,14 @@
   }
 
   .summaryCard,
+  .teacherReminderCard,
   .card,
   .studentCard {
     padding: 1rem;
+  }
+
+  .teacherReminderCard {
+    grid-template-columns: 1fr;
   }
 
   .summaryGrid {
