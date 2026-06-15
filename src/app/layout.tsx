@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Prayer Tracker",
-  description: "Track daily Islamic prayers for your children.",
+  title: "Prayer Tracking",
+  description: "Prayer tracking for children, mosque classes, madrasahs, families, and community organisations.",
 };
 
 export default function RootLayout({

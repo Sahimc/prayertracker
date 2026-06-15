@@ -55,7 +55,7 @@ export function StudentLoginForm({ organization }: StudentLoginFormProps) {
     <main className={styles.container}>
       <div className={`glass-panel ${styles.loginCard}`}>
         <div>
-          <h1 className={`text-gradient ${styles.title}`}>Prayer Tracker</h1>
+          <h1 className={`text-gradient ${styles.title}`}>Prayer Tracking</h1>
           <p className={styles.mosqueTitle}>{organization.name}</p>
           <p className={styles.subtitle}>{organization.town}</p>
         </div>

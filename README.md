@@ -1,6 +1,6 @@
-# Prayer Tracker
+# Prayer Tracking
 
-A simple mobile-first prayer tracker for children, mosque classes, madrasahs, families, and community organisations.
+A simple mobile-first prayer tracking app for children, mosque classes, madrasahs, families, and community organisations.
 
 The app is organized by mosque URL slug. Students and admins do not use email, passwords, PINs, or mosque codes.
 
