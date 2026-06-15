@@ -67,7 +67,7 @@ export function MosqueChooser() {
         </div>
 
         <div className={styles.form}>
-          <Link href="/create-mosque" className={styles.submitBtn}>
+          <Link href="/create-mosque" className={styles.submitBtn} style={{ marginTop: 0 }}>
             Create your mosque
           </Link>
 
