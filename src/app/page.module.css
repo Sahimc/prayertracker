@@ -110,6 +110,28 @@
   transform: translateY(0);
 }
 
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--glass-border);
+}
+
+.divider span {
+  opacity: 0.85;
+}
+
 .error {
   color: var(--accent-danger);
   font-size: 0.9rem;

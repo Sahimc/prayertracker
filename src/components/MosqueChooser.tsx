@@ -63,10 +63,18 @@ export function MosqueChooser() {
       <div className={`glass-panel ${styles.loginCard}`}>
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Choose your mosque</h1>
-          <p className={styles.subtitle}>Search for your mosque or madrasah to continue.</p>
+          <p className={styles.subtitle}>Search for your mosque or madrasah to continue. Or create your mosque.</p>
         </div>
 
         <div className={styles.form}>
+          <Link href="/create-mosque" className={styles.submitBtn}>
+            Create your mosque
+          </Link>
+
+          <div className={styles.divider} aria-hidden="true">
+            <span>OR</span>
+          </div>
+
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="mosque-search">
               Search
@@ -108,9 +116,6 @@ export function MosqueChooser() {
             </div>
           )}
 
-          <Link href="/create-mosque" className={styles.submitBtn}>
-            Create your mosque
-          </Link>
         </div>
       </div>
     </main>
