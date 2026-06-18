@@ -37,6 +37,8 @@ const ADMIN_STUDENTS = [
   { name: "Yusuf", completed: 5, points: 1110, status: [true, true, true, true, true] },
 ] as const;
 
+type AdminDemoMode = "all" | "needsReminder";
+
 function getMinutesFromTime(value: string): number {
   const [hour, minute] = value.split(":").map(Number);
   return hour * 60 + minute;
@@ -65,8 +67,20 @@ function getCompletedToday(currentMinutes: number | null, currentPrayer: PrayerN
   return new Set(PRAYERS.filter((_, index) => index < currentIndex));
 }
 
+export function HomeScrollCue() {
+  return (
+    <div className={styles.scrollCue} aria-hidden="true">
+      <span>See how it works</span>
+      <strong>{"\u2193"}</strong>
+    </div>
+  );
+}
+
 export function HomeProductShowcase() {
   const [currentMinutes, setCurrentMinutes] = useState<number | null>(null);
+  const [studentToggles, setStudentToggles] = useState<Set<PrayerName>>(new Set());
+  const [lastTappedPrayer, setLastTappedPrayer] = useState<PrayerName | null>(null);
+  const [adminMode, setAdminMode] = useState<AdminDemoMode>("all");
 
   useEffect(() => {
     function syncClock() {
@@ -81,7 +95,34 @@ export function HomeProductShowcase() {
 
   const currentPrayer = useMemo(() => getCurrentPrayer(currentMinutes), [currentMinutes]);
   const completedToday = useMemo(() => getCompletedToday(currentMinutes, currentPrayer), [currentMinutes, currentPrayer]);
-  const score = 900 + completedToday.size * 30;
+  const demoCompletedToday = useMemo(() => {
+    const next = new Set(completedToday);
+    for (const prayer of studentToggles) {
+      if (next.has(prayer)) {
+        next.delete(prayer);
+      } else {
+        next.add(prayer);
+      }
+    }
+    return next;
+  }, [completedToday, studentToggles]);
+  const score = 900 + demoCompletedToday.size * 30;
+  const filteredAdminStudents = adminMode === "needsReminder"
+    ? ADMIN_STUDENTS.filter((student) => student.completed < PRAYERS.length)
+    : ADMIN_STUDENTS;
+
+  function toggleDemoPrayer(prayer: PrayerName) {
+    setStudentToggles((current) => {
+      const next = new Set(current);
+      if (next.has(prayer)) {
+        next.delete(prayer);
+      } else {
+        next.add(prayer);
+      }
+      return next;
+    });
+    setLastTappedPrayer(prayer);
+  }
 
   return (
     <section className={styles.showcase} aria-label="Prayer Tracking app preview">
@@ -111,7 +152,7 @@ export function HomeProductShowcase() {
             <div className={styles.previewTopBar}>
               <div>
                 <h4>Salaam, Abdullah</h4>
-                <span>Green Lane Masjid · East Ham</span>
+                <span>Green Lane Masjid{" \u00b7 "}East Ham</span>
               </div>
               <span className={styles.demoPill}>Student</span>
             </div>
@@ -121,22 +162,29 @@ export function HomeProductShowcase() {
                 <span>Today&apos;s prayers</span>
                 <small>Live mosque times</small>
               </div>
+              <div className={styles.tryPrompt}>
+                <span>{lastTappedPrayer ? `${PRAYER_LABELS[lastTappedPrayer]} updated` : "Try it: tap any prayer"}</span>
+                <strong>{"\u2198"}</strong>
+              </div>
 
               <div className={styles.prayerGrid}>
                 {PRAYERS.map((prayer) => {
                   const isCurrent = currentPrayer === prayer;
-                  const isComplete = completedToday.has(prayer);
+                  const isComplete = demoCompletedToday.has(prayer);
 
                   return (
                     <div key={prayer} className={styles.prayerStack}>
-                      <div
+                      <button
+                        type="button"
                         className={`${styles.prayerCircle} ${isComplete ? styles.complete : ""} ${
                           isCurrent ? styles.current : ""
                         }`}
+                        onClick={() => toggleDemoPrayer(prayer)}
+                        aria-pressed={isComplete}
                       >
                         <strong>{PRAYER_LABELS[prayer]}</strong>
                         <span>{RAKAAT_MAP[prayer]}</span>
-                      </div>
+                      </button>
                       <div className={`${styles.timePill} ${isCurrent ? styles.now : ""}`}>
                         {isCurrent && <small>Now</small>}
                         {formatPrayerTime(DEMO_PRAYER_TIMES[prayer])}
@@ -150,6 +198,7 @@ export function HomeProductShowcase() {
                 <span>Lifetime Score</span>
                 <strong>{score} pts</strong>
               </div>
+              <p className={styles.demoFeedback}>{demoCompletedToday.size}/5 prayers complete today. Points update instantly.</p>
             </div>
 
             <div className={styles.weekPreview}>
@@ -185,7 +234,7 @@ export function HomeProductShowcase() {
           <div className={styles.adminHeader}>
             <div>
               <h4>Admin Dashboard</h4>
-              <span>Green Lane Masjid · East Ham</span>
+              <span>Green Lane Masjid{" \u00b7 "}East Ham</span>
             </div>
             <span className={styles.demoPill}>Aisha</span>
           </div>
@@ -205,7 +254,7 @@ export function HomeProductShowcase() {
           <div className={styles.adminTimes}>
             <div className={styles.cardHeading}>
               <span>Prayer times shown to students</span>
-              <small>London · Shafi</small>
+              <small>London{" \u00b7 "}Shafi</small>
             </div>
             <div className={styles.timeGrid}>
               {PRAYERS.map((prayer) => (
@@ -218,17 +267,34 @@ export function HomeProductShowcase() {
           </div>
 
           <div className={styles.fakeControls}>
-            <span>Search students</span>
-            <span>Incomplete today</span>
+            <button
+              type="button"
+              className={adminMode === "all" ? styles.activeControl : ""}
+              onClick={() => setAdminMode("all")}
+            >
+              All students
+            </button>
+            <button
+              type="button"
+              className={adminMode === "needsReminder" ? styles.activeControl : ""}
+              onClick={() => setAdminMode("needsReminder")}
+            >
+              Needs reminder
+            </button>
+          </div>
+          <div className={styles.adminTryPrompt}>
+            <span>Try it: filter the class</span>
+            <strong>{"\u2197"}</strong>
           </div>
 
           <div className={styles.studentRows}>
-            {ADMIN_STUDENTS.map((student) => (
+            {filteredAdminStudents.map((student) => (
               <div key={student.name} className={styles.adminStudent}>
                 <div>
                   <strong>{student.name}</strong>
                   <span>
-                    {student.completed}/5 today · {student.points} pts
+                    {student.completed}/5 today{" \u00b7 "}
+                    {student.points} pts
                   </span>
                 </div>
                 <div className={styles.statusDots}>
