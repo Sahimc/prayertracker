@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./HomeProductShowcase.module.css";
 import { ALADHAN_LATITUDE_ADJUSTMENTS, ALADHAN_METHODS, ALADHAN_SCHOOLS } from "@/lib/aladhan";
@@ -445,6 +446,20 @@ export function HomeProductShowcase() {
           </div>
         </div>
       </article>
+
+      <div className={styles.bottomCta}>
+        <p className={styles.eyebrow}>Start your mosque</p>
+        <h2>Ready to track prayers with your students?</h2>
+        <p>Create your mosque, add your first admin, and start using Prayer Tracking today.</p>
+        <Link href="/create-mosque" className={styles.bottomCtaButton}>
+          Create your mosque
+        </Link>
+      </div>
+
+      <footer className={styles.footer}>
+        <span>Copyright 2026 prayertracking.com</span>
+        <Link href="/terms">Terms and Conditions</Link>
+      </footer>
     </section>
   );
 }

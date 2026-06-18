@@ -1,0 +1,83 @@
+.container {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: 2rem 1rem max(5rem, env(safe-area-inset-bottom));
+}
+
+.card {
+  padding: 1.4rem;
+}
+
+.backLink {
+  display: inline-flex;
+  margin-bottom: 1.25rem;
+  color: #bfdbfe;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.eyebrow {
+  color: #67e8f9;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.card h1 {
+  color: var(--text-primary);
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  line-height: 0.98;
+  margin-bottom: 1rem;
+}
+
+.acceptance {
+  padding: 1rem;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.16), rgba(14, 165, 233, 0.1));
+  color: #e0f2fe;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.updated {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.sections {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.termSection {
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--border-radius-sm);
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.termSection h2 {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  margin-bottom: 0.45rem;
+}
+
+.termSection p {
+  color: #b6c5d8;
+  line-height: 1.6;
+}
+
+@media (min-width: 720px) {
+  .container {
+    padding: 3rem 2rem max(6rem, env(safe-area-inset-bottom));
+  }
+
+  .card {
+    padding: 2rem;
+  }
+}
