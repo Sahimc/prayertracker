@@ -165,9 +165,6 @@ export function StudentLoginForm({ organization }: StudentLoginFormProps) {
           <Link href={`/m/${organization.slug}/admin`} className={styles.secondaryLink}>
             Admin login
           </Link>
-          <Link href="/create-mosque" className={styles.secondaryLink}>
-            Create your mosque
-          </Link>
         </div>
       </div>
     </main>

@@ -114,6 +114,18 @@
   font-size: clamp(1.5rem, 6vw, 2.45rem);
 }
 
+.parentLine {
+  margin-bottom: 1rem;
+  padding: 0.78rem 0.9rem;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.18), rgba(14, 165, 233, 0.12));
+  color: #dff6ff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .featureList {
   display: flex;
   flex-wrap: wrap;
@@ -240,11 +252,22 @@
   font-weight: 900;
 }
 
+.tryPrompt {
+  border-color: rgba(248, 113, 113, 0.48);
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+}
+
 .tryPrompt strong,
 .adminTryPrompt strong {
   color: #fbbf24;
   font-size: 1rem;
   line-height: 1;
+}
+
+.tryPrompt strong {
+  color: #fb7185;
+  font-size: 1.15rem;
 }
 
 .prayerGrid {
@@ -484,6 +507,8 @@
 .timeGrid span {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.12rem;
   padding: 0.52rem 0.58rem;
   border: 1px solid rgba(167, 243, 208, 0.28);
@@ -492,12 +517,65 @@
   color: white;
   font-size: 0.72rem;
   font-weight: 900;
+  text-align: center;
 }
 
 .timeGrid strong {
   color: #a7f3d0;
   font-size: 0.58rem;
   text-transform: uppercase;
+}
+
+.changeTimesButton {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid rgba(125, 211, 252, 0.32);
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.28), rgba(20, 184, 166, 0.18));
+  color: #e0f2fe;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.prayerSettingsDemo {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.prayerSettingsDemo label {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prayerSettingsDemo label span {
+  color: #b6c5d8;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.prayerSettingsDemo select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.58rem 0.6rem;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: var(--border-radius-sm);
+  background: rgba(15, 23, 42, 0.82);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.prayerSettingsDemo option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .fakeControls {

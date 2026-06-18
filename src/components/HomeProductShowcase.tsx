@@ -2,15 +2,41 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./HomeProductShowcase.module.css";
+import { ALADHAN_LATITUDE_ADJUSTMENTS, ALADHAN_METHODS, ALADHAN_SCHOOLS } from "@/lib/aladhan";
 import { formatPrayerTime } from "@/lib/dates";
 import { PRAYER_LABELS, PRAYERS, RAKAAT_MAP, type PrayerName } from "@/lib/prayers";
 
-const DEMO_PRAYER_TIMES: Record<PrayerName, string> = {
-  fajr: "02:30",
-  dhuhr: "13:08",
-  asr: "17:25",
-  maghrib: "21:23",
-  isha: "23:27",
+type DemoLocation = "London" | "Luton" | "Birmingham" | "Manchester";
+
+const DEMO_PRAYER_TIMES: Record<DemoLocation, Record<PrayerName, string>> = {
+  London: {
+    fajr: "02:30",
+    dhuhr: "13:08",
+    asr: "17:25",
+    maghrib: "21:23",
+    isha: "23:27",
+  },
+  Luton: {
+    fajr: "02:35",
+    dhuhr: "13:12",
+    asr: "17:30",
+    maghrib: "21:26",
+    isha: "23:31",
+  },
+  Birmingham: {
+    fajr: "02:43",
+    dhuhr: "13:17",
+    asr: "17:36",
+    maghrib: "21:29",
+    isha: "23:35",
+  },
+  Manchester: {
+    fajr: "02:50",
+    dhuhr: "13:20",
+    asr: "17:42",
+    maghrib: "21:36",
+    isha: "23:42",
+  },
 };
 
 const STUDENT_CALLOUTS = ["Live current prayer", "Mosque prayer times", "30 points per prayer", "Weekly progress"];
@@ -44,12 +70,39 @@ function getMinutesFromTime(value: string): number {
   return hour * 60 + minute;
 }
 
-function getCurrentPrayer(currentMinutes: number | null): PrayerName {
+function addMinutes(value: string, minutes: number): string {
+  const dayMinutes = 24 * 60;
+  const total = (getMinutesFromTime(value) + minutes + dayMinutes) % dayMinutes;
+  const hour = Math.floor(total / 60);
+  const minute = total % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+function getDemoPrayerTimes(
+  location: DemoLocation,
+  method: number,
+  school: number,
+  latitudeAdjustmentMethod: number,
+): Record<PrayerName, string> {
+  const methodOffset = method === 15 ? -8 : method === 2 ? 10 : method === 1 ? 4 : 0;
+  const latitudeOffset = latitudeAdjustmentMethod === 1 ? 14 : latitudeAdjustmentMethod === 2 ? 8 : 0;
+  const base = DEMO_PRAYER_TIMES[location];
+
+  return {
+    fajr: addMinutes(base.fajr, methodOffset * -1),
+    dhuhr: base.dhuhr,
+    asr: addMinutes(base.asr, school === 1 ? 55 : 0),
+    maghrib: base.maghrib,
+    isha: addMinutes(base.isha, latitudeOffset + methodOffset),
+  };
+}
+
+function getCurrentPrayer(currentMinutes: number | null, prayerTimes: Record<PrayerName, string>): PrayerName {
   if (currentMinutes === null) return "dhuhr";
 
   let currentPrayer: PrayerName | null = null;
   for (const prayer of PRAYERS) {
-    if (getMinutesFromTime(DEMO_PRAYER_TIMES[prayer]) <= currentMinutes) {
+    if (getMinutesFromTime(prayerTimes[prayer]) <= currentMinutes) {
       currentPrayer = prayer;
     }
   }
@@ -57,9 +110,13 @@ function getCurrentPrayer(currentMinutes: number | null): PrayerName {
   return currentPrayer ?? "isha";
 }
 
-function getCompletedToday(currentMinutes: number | null, currentPrayer: PrayerName): Set<PrayerName> {
+function getCompletedToday(
+  currentMinutes: number | null,
+  currentPrayer: PrayerName,
+  prayerTimes: Record<PrayerName, string>,
+): Set<PrayerName> {
   if (currentMinutes === null) return new Set(["fajr"]);
-  if (currentPrayer === "isha" && currentMinutes < getMinutesFromTime(DEMO_PRAYER_TIMES.fajr)) {
+  if (currentPrayer === "isha" && currentMinutes < getMinutesFromTime(prayerTimes.fajr)) {
     return new Set();
   }
 
@@ -81,6 +138,11 @@ export function HomeProductShowcase() {
   const [studentToggles, setStudentToggles] = useState<Set<PrayerName>>(new Set());
   const [lastTappedPrayer, setLastTappedPrayer] = useState<PrayerName | null>(null);
   const [adminMode, setAdminMode] = useState<AdminDemoMode>("all");
+  const [showPrayerSettings, setShowPrayerSettings] = useState(false);
+  const [demoLocation, setDemoLocation] = useState<DemoLocation>("London");
+  const [demoMethod, setDemoMethod] = useState(3);
+  const [demoSchool, setDemoSchool] = useState(0);
+  const [demoLatitude, setDemoLatitude] = useState(3);
 
   useEffect(() => {
     function syncClock() {
@@ -93,8 +155,15 @@ export function HomeProductShowcase() {
     return () => window.clearInterval(interval);
   }, []);
 
-  const currentPrayer = useMemo(() => getCurrentPrayer(currentMinutes), [currentMinutes]);
-  const completedToday = useMemo(() => getCompletedToday(currentMinutes, currentPrayer), [currentMinutes, currentPrayer]);
+  const demoPrayerTimes = useMemo(
+    () => getDemoPrayerTimes(demoLocation, demoMethod, demoSchool, demoLatitude),
+    [demoLatitude, demoLocation, demoMethod, demoSchool],
+  );
+  const currentPrayer = useMemo(() => getCurrentPrayer(currentMinutes, demoPrayerTimes), [currentMinutes, demoPrayerTimes]);
+  const completedToday = useMemo(
+    () => getCompletedToday(currentMinutes, currentPrayer, demoPrayerTimes),
+    [currentMinutes, currentPrayer, demoPrayerTimes],
+  );
   const demoCompletedToday = useMemo(() => {
     const next = new Set(completedToday);
     for (const prayer of studentToggles) {
@@ -139,6 +208,9 @@ export function HomeProductShowcase() {
       <article className={styles.previewSection}>
         <div className={styles.previewCopy}>
           <p className={styles.eyebrow}>Student dashboard</p>
+          <div className={styles.parentLine}>
+            Parents and students can both log in to view progress and keep daily salah on track.
+          </div>
           <h3>Children know what to pray now and what they have completed.</h3>
           <p>
             A friendly daily dashboard shows prayer times, progress, points, and missed prayers without making the
@@ -163,8 +235,8 @@ export function HomeProductShowcase() {
                 <small>Live mosque times</small>
               </div>
               <div className={styles.tryPrompt}>
-                <span>{lastTappedPrayer ? `${PRAYER_LABELS[lastTappedPrayer]} updated` : "Try it: tap any prayer"}</span>
-                <strong>{"\u2198"}</strong>
+                <strong>{"\u2193"}</strong>
+                <span>Try clicking on the prayers below</span>
               </div>
 
               <div className={styles.prayerGrid}>
@@ -187,7 +259,7 @@ export function HomeProductShowcase() {
                       </button>
                       <div className={`${styles.timePill} ${isCurrent ? styles.now : ""}`}>
                         {isCurrent && <small>Now</small>}
-                        {formatPrayerTime(DEMO_PRAYER_TIMES[prayer])}
+                        {formatPrayerTime(demoPrayerTimes[prayer])}
                       </div>
                     </div>
                   );
@@ -198,7 +270,10 @@ export function HomeProductShowcase() {
                 <span>Lifetime Score</span>
                 <strong>{score} pts</strong>
               </div>
-              <p className={styles.demoFeedback}>{demoCompletedToday.size}/5 prayers complete today. Points update instantly.</p>
+              <p className={styles.demoFeedback}>
+                {lastTappedPrayer ? `${PRAYER_LABELS[lastTappedPrayer]} changed. ` : ""}
+                {demoCompletedToday.size}/5 prayers complete today. Points update instantly.
+              </p>
             </div>
 
             <div className={styles.weekPreview}>
@@ -254,16 +329,70 @@ export function HomeProductShowcase() {
           <div className={styles.adminTimes}>
             <div className={styles.cardHeading}>
               <span>Prayer times shown to students</span>
-              <small>London{" \u00b7 "}Shafi</small>
+              <small>
+                {demoLocation}{" \u00b7 "}
+                {demoSchool === 1 ? "Hanafi" : "Shafi"}
+              </small>
             </div>
             <div className={styles.timeGrid}>
               {PRAYERS.map((prayer) => (
                 <span key={prayer}>
                   <strong>{PRAYER_LABELS[prayer]}</strong>
-                  {formatPrayerTime(DEMO_PRAYER_TIMES[prayer])}
+                  {formatPrayerTime(demoPrayerTimes[prayer])}
                 </span>
               ))}
             </div>
+            <button
+              type="button"
+              className={styles.changeTimesButton}
+              onClick={() => setShowPrayerSettings((current) => !current)}
+            >
+              Change prayer times calculation
+            </button>
+            {showPrayerSettings && (
+              <div className={styles.prayerSettingsDemo}>
+                <label>
+                  <span>Location</span>
+                  <select value={demoLocation} onChange={(event) => setDemoLocation(event.target.value as DemoLocation)}>
+                    {Object.keys(DEMO_PRAYER_TIMES).map((location) => (
+                      <option key={location} value={location}>
+                        {location}, GB
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Method</span>
+                  <select value={demoMethod} onChange={(event) => setDemoMethod(Number(event.target.value))}>
+                    {ALADHAN_METHODS.filter((method) => [1, 2, 3, 15].includes(method.id)).map((method) => (
+                      <option key={method.id} value={method.id}>
+                        {method.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>School</span>
+                  <select value={demoSchool} onChange={(event) => setDemoSchool(Number(event.target.value))}>
+                    {ALADHAN_SCHOOLS.map((school) => (
+                      <option key={school.id} value={school.id}>
+                        {school.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>High latitude</span>
+                  <select value={demoLatitude} onChange={(event) => setDemoLatitude(Number(event.target.value))}>
+                    {ALADHAN_LATITUDE_ADJUSTMENTS.map((method) => (
+                      <option key={method.id} value={method.id}>
+                        {method.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
           </div>
 
           <div className={styles.fakeControls}>
