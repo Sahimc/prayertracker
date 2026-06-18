@@ -1,0 +1,564 @@
+.showcase {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 0 1rem max(6rem, env(safe-area-inset-bottom));
+}
+
+.promiseCard {
+  margin: 0 auto 2rem;
+  padding: 1.15rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: var(--border-radius-md);
+  background: rgba(15, 23, 42, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.promiseCard p {
+  color: #e2e8f0;
+  font-size: clamp(1.1rem, 4vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.sectionHeader {
+  margin: 0 auto 2rem;
+  max-width: 620px;
+  text-align: center;
+}
+
+.eyebrow {
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.sectionHeader h2,
+.previewCopy h3 {
+  color: var(--text-primary);
+  font-size: clamp(1.65rem, 7vw, 3rem);
+  line-height: 1;
+  margin-bottom: 0.7rem;
+}
+
+.sectionHeader p,
+.previewCopy p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.previewSection {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--border-radius-lg);
+  background:
+    linear-gradient(180deg, rgba(30, 41, 59, 0.66), rgba(15, 23, 42, 0.42)),
+    rgba(15, 23, 42, 0.54);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+}
+
+.adminSection {
+  margin-top: 1rem;
+}
+
+.previewCopy {
+  padding: 0.35rem 0.15rem 0;
+}
+
+.previewCopy h3 {
+  font-size: clamp(1.45rem, 6vw, 2.45rem);
+}
+
+.featureList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.featureList span {
+  border: 1px solid rgba(96, 165, 250, 0.26);
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #bfdbfe;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.42rem 0.62rem;
+}
+
+.phoneFrame,
+.adminFrame {
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 45%),
+    rgba(15, 23, 42, 0.9);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 22px 60px rgba(0, 0, 0, 0.38);
+}
+
+.phoneFrame {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.phoneScreen {
+  padding: 1rem;
+}
+
+.previewTopBar,
+.adminHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.previewTopBar h4,
+.adminHeader h4 {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  margin-bottom: 0.22rem;
+}
+
+.previewTopBar span,
+.adminHeader span {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.demoPill {
+  border: 1px solid rgba(52, 211, 153, 0.38);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #a7f3d0 !important;
+  font-size: 0.72rem !important;
+  font-weight: 800;
+  padding: 0.32rem 0.55rem;
+  white-space: nowrap;
+}
+
+.studentCard,
+.weekPreview,
+.adminTimes,
+.teacherReminder,
+.teacherAccess,
+.adminStudent {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--border-radius-md);
+  background: rgba(30, 41, 59, 0.54);
+}
+
+.studentCard,
+.weekPreview {
+  padding: 1rem;
+}
+
+.cardHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 0.9rem;
+}
+
+.cardHeading span {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.cardHeading small {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.prayerGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 0.65rem;
+}
+
+.prayerStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prayerCircle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 2px solid rgba(148, 163, 184, 0.22);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.prayerCircle strong {
+  font-size: 0.86rem;
+}
+
+.prayerCircle span {
+  position: absolute;
+  bottom: -8px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #111827;
+  border-radius: 50%;
+  background: var(--accent-warning);
+  color: #111827;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.prayerCircle.complete {
+  border-color: transparent;
+  background: var(--gradient-success);
+  box-shadow: 0 12px 26px rgba(16, 185, 129, 0.25);
+}
+
+.prayerCircle.current {
+  border-color: rgba(52, 211, 153, 0.95);
+  box-shadow:
+    0 0 0 5px rgba(16, 185, 129, 0.16),
+    0 0 24px rgba(16, 185, 129, 0.5);
+}
+
+.timePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 30px;
+  padding: 0.32rem 0.62rem;
+  border: 1px solid rgba(147, 197, 253, 0.45);
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.2);
+  color: #eff6ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.timePill.now {
+  border-color: rgba(167, 243, 208, 0.85);
+  background: rgba(16, 185, 129, 0.72);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.32);
+}
+
+.timePill small {
+  color: #d1fae5;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  color: var(--text-secondary);
+}
+
+.scoreRow strong {
+  color: var(--accent-warning);
+  font-size: 1.45rem;
+}
+
+.weekPreview {
+  margin-top: 0.8rem;
+}
+
+.weekStrip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.weekDay {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.24rem;
+  padding: 0.5rem 0.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.weekDay strong {
+  font-size: 0.62rem;
+}
+
+.weekDay span {
+  color: var(--text-secondary);
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.weekDay.complete {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.16);
+}
+
+.weekDay.missed {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.weekDay.today {
+  border-color: rgba(96, 165, 250, 0.42);
+  background: rgba(59, 130, 246, 0.18);
+}
+
+.weekDay.future {
+  opacity: 0.55;
+}
+
+.adminFrame {
+  padding: 1rem;
+}
+
+.adminStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--border-radius-sm);
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.metric strong {
+  color: #93c5fd;
+  font-size: 1.35rem;
+}
+
+.metric span {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.teacherReminder,
+.teacherAccess {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.8rem;
+  margin-bottom: 0.75rem;
+  border-color: rgba(52, 211, 153, 0.26);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.teacherReminder strong,
+.teacherAccess strong {
+  color: #d1fae5;
+  font-size: 0.86rem;
+}
+
+.teacherReminder span,
+.teacherAccess span {
+  color: #bfdbfe;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.adminTimes {
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.timeGrid span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  padding: 0.48rem 0.55rem;
+  border: 1px solid rgba(167, 243, 208, 0.26);
+  border-radius: 999px;
+  background: rgba(5, 150, 105, 0.16);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.timeGrid strong {
+  color: #a7f3d0;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+
+.fakeControls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.fakeControls span {
+  overflow: hidden;
+  padding: 0.62rem 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--border-radius-sm);
+  background: rgba(15, 23, 42, 0.62);
+  color: var(--text-secondary);
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.studentRows {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.adminStudent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.75rem;
+}
+
+.adminStudent div:first-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.adminStudent strong {
+  color: var(--text-primary);
+  font-size: 0.86rem;
+}
+
+.adminStudent span {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.statusDots {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.28rem;
+}
+
+.statusDots span {
+  display: block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+}
+
+.doneDot {
+  background: #34d399;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.45);
+}
+
+.missedDot {
+  background: #ef4444;
+}
+
+.teacherAccess {
+  margin-bottom: 0;
+}
+
+@media (min-width: 760px) {
+  .showcase {
+    padding-inline: 2rem;
+  }
+
+  .promiseCard {
+    padding: 1.4rem 1.75rem;
+  }
+
+  .previewSection {
+    grid-template-columns: minmax(0, 0.82fr) minmax(360px, 1fr);
+    align-items: center;
+    gap: 1.75rem;
+    padding: 1.4rem;
+  }
+
+  .adminSection {
+    grid-template-columns: minmax(360px, 1fr) minmax(0, 0.82fr);
+  }
+
+  .adminSection .previewCopy {
+    order: 2;
+  }
+
+  .adminFrame {
+    order: 1;
+  }
+
+  .phoneFrame {
+    width: 100%;
+  }
+
+  .prayerGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 370px) {
+  .showcase {
+    padding-inline: 0.75rem;
+  }
+
+  .previewSection {
+    padding: 0.75rem;
+    border-radius: 20px;
+  }
+
+  .phoneScreen,
+  .adminFrame {
+    padding: 0.75rem;
+  }
+
+  .prayerCircle {
+    width: 68px;
+    height: 68px;
+  }
+
+  .timePill {
+    font-size: 0.66rem;
+    padding-inline: 0.5rem;
+  }
+}
