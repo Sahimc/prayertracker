@@ -134,7 +134,11 @@ export function HomeScrollCue() {
   );
 }
 
-export function HomeProductShowcase() {
+type HomeProductShowcaseProps = {
+  currentYear: number;
+};
+
+export function HomeProductShowcase({ currentYear }: HomeProductShowcaseProps) {
   const [currentMinutes, setCurrentMinutes] = useState<number | null>(null);
   const [studentToggles, setStudentToggles] = useState<Set<PrayerName>>(new Set());
   const [lastTappedPrayer, setLastTappedPrayer] = useState<PrayerName | null>(null);
@@ -204,6 +208,7 @@ export function HomeProductShowcase() {
         <p className={styles.eyebrow}>Product preview</p>
         <h2>Check out the app!</h2>
         <p>A simple daily view for students, and a clear class view for teachers.</p>
+        <p className={styles.freeLine}>This app is 100% free.</p>
       </div>
 
       <article className={styles.previewSection}>
@@ -457,7 +462,7 @@ export function HomeProductShowcase() {
       </div>
 
       <footer className={styles.footer}>
-        <span>Copyright 2026 prayertracking.com</span>
+        <span>Copyright {currentYear} prayertracking.com</span>
         <Link href="/terms">Terms and Conditions</Link>
       </footer>
     </section>

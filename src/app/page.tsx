@@ -4,11 +4,13 @@ import { HomeProductShowcase, HomeScrollCue } from "@/components/HomeProductShow
 export const dynamic = "force-dynamic";
 
 export default function Home() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <>
       <MosqueChooser />
       <HomeScrollCue />
-      <HomeProductShowcase />
+      <HomeProductShowcase currentYear={currentYear} />
     </>
   );
 }

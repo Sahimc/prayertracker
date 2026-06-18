@@ -87,6 +87,18 @@
   line-height: 1.6;
 }
 
+.sectionHeader .freeLine {
+  width: fit-content;
+  margin: 0.85rem auto 0;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(45, 212, 191, 0.34);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.14);
+  color: #a7f3d0;
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
 .previewSection {
   display: grid;
   gap: 1.7rem;
