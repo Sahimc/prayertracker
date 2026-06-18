@@ -45,8 +45,16 @@ export default async function AdminStudentDetailPage({ params }: AdminStudentDet
     select: {
       id: true,
       organizationId: true,
+      classId: true,
       fullName: true,
       dateOfBirth: true,
+      class: {
+        select: {
+          id: true,
+          organizationId: true,
+          name: true,
+        },
+      },
       prayers: {
         select: {
           id: true,

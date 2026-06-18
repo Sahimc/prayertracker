@@ -18,6 +18,7 @@ import {
 } from "@/lib/prayers";
 import type {
   AdminSummary,
+  ClassSummary,
   OrganizationSummary,
   PrayerLogSummary,
   PrayerSettingsSummary,
@@ -30,6 +31,7 @@ type AdminDashboardClientProps = {
   organization: OrganizationSummary;
   initialStudents: StudentSummary[];
   initialAdmins: AdminSummary[];
+  initialClasses: ClassSummary[];
   initialPrayerSettings: PrayerSettingsSummary;
   initialPrayerTime: PrayerTimeSummary | null;
   mosqueSlug: string;
@@ -37,6 +39,12 @@ type AdminDashboardClientProps = {
 
 type StudentResponse = {
   student?: StudentSummary;
+  class?: ClassSummary;
+  error?: string;
+};
+
+type ClassResponse = {
+  class?: ClassSummary;
   error?: string;
 };
 
@@ -57,6 +65,7 @@ type AdminResponse = {
 };
 
 type PeopleMode = "students" | "admins";
+type StudentClassMode = "existing" | "new";
 type FilterMode = "all" | "completed" | "incomplete";
 type SortMode = "name" | "points" | "mostToday" | "leastToday";
 
@@ -82,23 +91,33 @@ export function AdminDashboardClient({
   organization,
   initialStudents,
   initialAdmins,
+  initialClasses,
   initialPrayerSettings,
   initialPrayerTime,
   mosqueSlug,
 }: AdminDashboardClientProps) {
   const [students, setStudents] = useState(initialStudents);
   const [admins, setAdmins] = useState(initialAdmins);
+  const [classes, setClasses] = useState(initialClasses);
+  const [newClassName, setNewClassName] = useState("");
   const [newFullName, setNewFullName] = useState("");
   const [newDob, setNewDob] = useState("");
+  const [newStudentClassMode, setNewStudentClassMode] = useState<StudentClassMode>(
+    initialClasses.length > 0 ? "existing" : "new",
+  );
+  const [newStudentClassId, setNewStudentClassId] = useState(initialClasses[0]?.id ?? "");
+  const [newStudentNewClassName, setNewStudentNewClassName] = useState("");
   const [newAdminFullName, setNewAdminFullName] = useState("");
   const [newAdminDob, setNewAdminDob] = useState("");
   const [query, setQuery] = useState("");
   const [peopleMode, setPeopleMode] = useState<PeopleMode>("students");
+  const [classFilterId, setClassFilterId] = useState("all");
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [sortMode, setSortMode] = useState<SortMode>("name");
   const [editingStudentId, setEditingStudentId] = useState("");
   const [editFullName, setEditFullName] = useState("");
   const [editDob, setEditDob] = useState("");
+  const [editClassId, setEditClassId] = useState("");
   const [prayerTime, setPrayerTime] = useState(initialPrayerTime);
   const [prayerSettings, setPrayerSettings] = useState<PrayerSettingsSummary>(initialPrayerSettings);
   const [prayerSettingsLoading, setPrayerSettingsLoading] = useState(false);
@@ -132,6 +151,13 @@ export function AdminDashboardClient({
 
   const todayDateStr = getFormatDate(new Date());
 
+  const classStudentCounts = useMemo(() => {
+    return students.reduce<Record<string, number>>((counts, student) => {
+      counts[student.classId] = (counts[student.classId] ?? 0) + 1;
+      return counts;
+    }, {});
+  }, [students]);
+
   const studentsWithStats = useMemo<StudentWithStats[]>(() => {
     return students.map((student) => {
       const todayLog = getTodayLog(student, todayDateStr);
@@ -148,7 +174,9 @@ export function AdminDashboardClient({
 
     return studentsWithStats
       .filter((student) => {
-        if (normalizedQuery && !student.fullName.toLowerCase().includes(normalizedQuery)) return false;
+        const searchableText = `${student.fullName} ${student.class.name}`.toLowerCase();
+        if (normalizedQuery && !searchableText.includes(normalizedQuery)) return false;
+        if (classFilterId !== "all" && student.classId !== classFilterId) return false;
         if (filterMode === "completed") return student.todayCompleted === PRAYERS.length;
         if (filterMode === "incomplete") return student.todayCompleted < PRAYERS.length;
         return true;
@@ -159,7 +187,7 @@ export function AdminDashboardClient({
         if (sortMode === "leastToday") return a.todayCompleted - b.todayCompleted || a.fullName.localeCompare(b.fullName);
         return a.fullName.localeCompare(b.fullName);
       });
-  }, [filterMode, query, sortMode, studentsWithStats]);
+  }, [classFilterId, filterMode, query, sortMode, studentsWithStats]);
 
   const filteredAdmins = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -187,16 +215,59 @@ export function AdminDashboardClient({
     return { totalStudents, activeToday, totalCompleted, averageCompletion, perPrayer };
   }, [studentsWithStats, todayDateStr]);
 
-  async function handleCreateStudent(event: React.FormEvent<HTMLFormElement>) {
+  function upsertClassInState(nextClass: ClassSummary) {
+    setClasses((currentClasses) => {
+      if (currentClasses.some((studentClass) => studentClass.id === nextClass.id)) {
+        return currentClasses;
+      }
+
+      return [...currentClasses, nextClass].sort((a, b) => a.name.localeCompare(b.name));
+    });
+  }
+
+  async function handleCreateClass(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSuccess("");
 
     try {
+      const response = await fetch("/api/classes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newClassName }),
+      });
+      const data = (await response.json()) as ClassResponse;
+
+      if (!response.ok || !data.class) {
+        throw new Error(data.error || "Failed to create class");
+      }
+
+      upsertClassInState(data.class);
+      setNewClassName("");
+      setNewStudentClassMode("existing");
+      setNewStudentClassId(data.class.id);
+      setClassFilterId(data.class.id);
+      setSuccess("Class created.");
+    } catch (createError) {
+      setError(createError instanceof Error ? createError.message : "Failed to create class");
+    }
+  }
+
+  async function handleCreateStudent(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setSuccess("");
+
+    const shouldCreateClass = classes.length === 0 || newStudentClassMode === "new";
+    const studentPayload = shouldCreateClass
+      ? { fullName: newFullName, dob: newDob, newClassName: newStudentNewClassName }
+      : { fullName: newFullName, dob: newDob, classId: newStudentClassId };
+
+    try {
       const response = await fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: newFullName, dob: newDob }),
+        body: JSON.stringify(studentPayload),
       });
       const data = (await response.json()) as StudentResponse;
 
@@ -205,8 +276,17 @@ export function AdminDashboardClient({
       }
 
       setStudents((currentStudents) => [...currentStudents, data.student as StudentSummary]);
+      if (data.class) {
+        upsertClassInState(data.class);
+        setNewStudentClassMode("existing");
+        setNewStudentClassId(data.class.id);
+      } else if (data.student.class) {
+        upsertClassInState(data.student.class);
+        setNewStudentClassId(data.student.classId);
+      }
       setNewFullName("");
       setNewDob("");
+      setNewStudentNewClassName("");
       setSuccess("Student added.");
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Failed to create student");
@@ -244,6 +324,7 @@ export function AdminDashboardClient({
     setEditingStudentId(student.id);
     setEditFullName(student.fullName);
     setEditDob(formatIsoToUkDate(student.dateOfBirth));
+    setEditClassId(student.classId);
     setError("");
     setSuccess("");
   }
@@ -258,7 +339,7 @@ export function AdminDashboardClient({
       const response = await fetch(`/api/students/${editingStudentId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: editFullName, dob: editDob }),
+        body: JSON.stringify({ fullName: editFullName, dob: editDob, classId: editClassId }),
       });
       const data = (await response.json()) as StudentResponse;
 
@@ -423,7 +504,7 @@ export function AdminDashboardClient({
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Admin Dashboard</h1>
           <p className={styles.mosqueMeta}>
-            {organization.name} · {organization.town} · {formatUKDate(todayDateStr)}
+            {organization.name} {"\u00b7"} {organization.town} {"\u00b7"} {formatUKDate(todayDateStr)}
           </p>
         </div>
         <button
@@ -478,6 +559,42 @@ export function AdminDashboardClient({
 
       <div className={styles.grid}>
         <div className={styles.sidebar}>
+          <div className={`glass-panel ${styles.card}`}>
+            <h2 className={styles.cardTitle}>Classes</h2>
+            <p className={styles.helperText}>Every student must belong to a class.</p>
+            <form className={styles.form} onSubmit={handleCreateClass}>
+              <input
+                type="text"
+                placeholder="Class name"
+                className={styles.input}
+                value={newClassName}
+                onChange={(event) => setNewClassName(event.target.value)}
+                required
+              />
+              <button type="submit" className={styles.submitBtn}>
+                Create Class
+              </button>
+            </form>
+            <div className={styles.classList}>
+              {classes.map((studentClass) => {
+                const studentCount = classStudentCounts[studentClass.id] ?? 0;
+                return (
+                  <span key={studentClass.id} className={styles.classChip}>
+                    <strong>{studentClass.name}</strong>
+                    <small>
+                      {studentCount} {studentCount === 1 ? "student" : "students"}
+                    </small>
+                  </span>
+                );
+              })}
+              {classes.length === 0 && (
+                <p className={styles.classEmpty}>
+                  Create your first class here, or create it while adding the first student.
+                </p>
+              )}
+            </div>
+          </div>
+
           <div className={`glass-panel ${styles.card}`}>
             <h2 className={styles.cardTitle}>Add Student</h2>
             <form className={styles.form} onSubmit={handleCreateStudent}>
@@ -538,6 +655,45 @@ export function AdminDashboardClient({
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
               </div>
+              {classes.length > 0 && (
+                <label className={styles.timeLabel}>
+                  <span>Class</span>
+                  <select
+                    className={styles.input}
+                    value={newStudentClassMode === "new" ? "__new__" : newStudentClassId}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (value === "__new__") {
+                        setNewStudentClassMode("new");
+                        setNewStudentClassId("");
+                        return;
+                      }
+
+                      setNewStudentClassMode("existing");
+                      setNewStudentClassId(value);
+                    }}
+                    required
+                  >
+                    <option value="">Choose class</option>
+                    {classes.map((studentClass) => (
+                      <option key={studentClass.id} value={studentClass.id}>
+                        {studentClass.name}
+                      </option>
+                    ))}
+                    <option value="__new__">Create new class</option>
+                  </select>
+                </label>
+              )}
+              {(classes.length === 0 || newStudentClassMode === "new") && (
+                <input
+                  type="text"
+                  placeholder={classes.length === 0 ? "First class name" : "New class name"}
+                  className={styles.input}
+                  value={newStudentNewClassName}
+                  onChange={(event) => setNewStudentNewClassName(event.target.value)}
+                  required
+                />
+              )}
               <button type="submit" className={styles.submitBtn}>
                 Create Student
               </button>
@@ -737,6 +893,18 @@ export function AdminDashboardClient({
               </select>
               <select
                 className={styles.input}
+                value={classFilterId}
+                onChange={(event) => setClassFilterId(event.target.value)}
+              >
+                <option value="all">All classes</option>
+                {classes.map((studentClass) => (
+                  <option key={studentClass.id} value={studentClass.id}>
+                    {studentClass.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                className={styles.input}
                 value={sortMode}
                 onChange={(event) => setSortMode(event.target.value as SortMode)}
               >
@@ -758,7 +926,7 @@ export function AdminDashboardClient({
                 <div>
                   <h3 className={styles.studentName}>{admin.fullName}</h3>
                   <p className={styles.studentMeta}>
-                    DOB {formatIsoToUkDate(admin.dateOfBirth)} · Admin
+                    DOB {formatIsoToUkDate(admin.dateOfBirth)} {"\u00b7"} Admin
                   </p>
                 </div>
               </div>
@@ -775,7 +943,8 @@ export function AdminDashboardClient({
                   <div>
                     <h3 className={styles.studentName}>{student.fullName}</h3>
                     <p className={styles.studentMeta}>
-                      DOB {formatIsoToUkDate(student.dateOfBirth)} · {student.todayCompleted}/5 today ·{" "}
+                      Class {student.class.name} {"\u00b7"} DOB {formatIsoToUkDate(student.dateOfBirth)}{" "}
+                      {"\u00b7"} {student.todayCompleted}/5 today {"\u00b7"}{" "}
                       {student.totalPoints} pts
                     </p>
                   </div>
@@ -853,6 +1022,19 @@ export function AdminDashboardClient({
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                       </svg>
                     </div>
+                    <select
+                      className={styles.input}
+                      value={editClassId}
+                      onChange={(event) => setEditClassId(event.target.value)}
+                      required
+                    >
+                      <option value="">Choose class</option>
+                      {classes.map((studentClass) => (
+                        <option key={studentClass.id} value={studentClass.id}>
+                          {studentClass.name}
+                        </option>
+                      ))}
+                    </select>
                     <button type="submit" className={styles.submitBtn}>
                       Save
                     </button>

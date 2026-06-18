@@ -34,6 +34,8 @@ npm run db:seed
 
 Do not run the reset command against production, hosted, or real-user data. This repo currently contains Vercel/Postgres-style environment variables, so confirm the target database is local/dev before resetting.
 
+The class migration keeps mosques, admins, prayer settings, and prayer times, but intentionally removes existing students and prayer logs because every student must now belong to one class.
+
 ## Main Routes
 
 - `/` choose mosque
@@ -54,18 +56,24 @@ Seed data creates two mosques.
 Green Lane Masjid (East Ham), slug `green-lane-masjid`:
 
 - Admin: `Aisha`, DOB `01/02/1990`
-- Student: `Abdullah`, DOB `01/02/2020`
-- Student: `Maryam`, DOB `15/05/2019`
-- Student: `Yusuf`, DOB `22/08/2018`
+- Classes: `Beginners`, `Level 1`
+- Student: `Abdullah`, DOB `01/02/2020`, class `Beginners`
+- Student: `Maryam`, DOB `15/05/2019`, class `Beginners`
+- Student: `Yusuf`, DOB `22/08/2018`, class `Level 1`
 
 Masjid Umar (Luton), slug `masjid-umar`:
 
 - Admin: `Omar`, DOB `05/06/1988`
-- Student: `Abdullah`, DOB `01/02/2020`
-- Student: `Safiya`, DOB `09/11/2019`
-- Student: `Ibrahim`, DOB `17/03/2018`
+- Classes: `Weekday Class`, `Weekend Class`
+- Student: `Abdullah`, DOB `01/02/2020`, class `Weekday Class`
+- Student: `Safiya`, DOB `09/11/2019`, class `Weekend Class`
+- Student: `Ibrahim`, DOB `17/03/2018`, class `Weekday Class`
 
 All DOB entry in the UI is UK format `DD/MM/YYYY`. The database stores DOB values as normalized `YYYY-MM-DD`.
+
+## Classes
+
+Classes belong to a mosque, not to an individual admin. Every student must be assigned to exactly one class. Admins can create classes from the admin dashboard or while adding a new student. The admin student list can search by student name or class name and filter by class.
 
 ## Security Model
 

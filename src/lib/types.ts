@@ -41,9 +41,17 @@ export type PrayerTimeSummary = {
   isha: string;
 };
 
+export type ClassSummary = {
+  id: string;
+  organizationId: string;
+  name: string;
+};
+
 export type StudentSummary = {
   id: string;
   organizationId: string;
+  classId: string;
+  class: ClassSummary;
   fullName: string;
   dateOfBirth: string;
   prayers: PrayerLogSummary[];

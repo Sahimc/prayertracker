@@ -34,7 +34,7 @@ function logFor(student, date, completePrayers) {
   };
 }
 
-async function createOrganization({ name, town, slug, admin, students, prayerTimes }) {
+async function createOrganization({ name, town, slug, admin, classes, students, prayerTimes }) {
   const organization = await prisma.organization.create({
     data: { name, town, slug },
   });
@@ -48,11 +48,29 @@ async function createOrganization({ name, town, slug, admin, students, prayerTim
     },
   });
 
+  const createdClasses = new Map();
+  for (const className of classes) {
+    const createdClass = await prisma.class.create({
+      data: {
+        organizationId: organization.id,
+        name: className,
+        normalizedName: normalizeName(className),
+      },
+    });
+    createdClasses.set(className, createdClass);
+  }
+
   const createdStudents = [];
   for (const student of students) {
+    const studentClass = createdClasses.get(student.className);
+    if (!studentClass) {
+      throw new Error(`Missing class "${student.className}" for ${student.fullName}`);
+    }
+
     const created = await prisma.student.create({
       data: {
         organizationId: organization.id,
+        classId: studentClass.id,
         fullName: student.fullName,
         normalizedName: normalizeName(student.fullName),
         dateOfBirth: student.dateOfBirth,
@@ -73,7 +91,7 @@ async function createOrganization({ name, town, slug, admin, students, prayerTim
     },
   });
 
-  return { organization, students: createdStudents };
+  return { organization, classes: [...createdClasses.values()], students: createdStudents };
 }
 
 async function main() {
@@ -81,6 +99,7 @@ async function main() {
   await prisma.prayerTime.deleteMany();
   await prisma.student.deleteMany();
   await prisma.admin.deleteMany();
+  await prisma.class.deleteMany();
   await prisma.organization.deleteMany();
 
   const today = new Date();
@@ -92,10 +111,11 @@ async function main() {
     town: "East Ham",
     slug: "green-lane-masjid",
     admin: { fullName: "Aisha", dateOfBirth: "1990-02-01" },
+    classes: ["Beginners", "Level 1"],
     students: [
-      { fullName: "Abdullah", dateOfBirth: "2020-02-01" },
-      { fullName: "Maryam", dateOfBirth: "2019-05-15" },
-      { fullName: "Yusuf", dateOfBirth: "2018-08-22" },
+      { fullName: "Abdullah", dateOfBirth: "2020-02-01", className: "Beginners" },
+      { fullName: "Maryam", dateOfBirth: "2019-05-15", className: "Beginners" },
+      { fullName: "Yusuf", dateOfBirth: "2018-08-22", className: "Level 1" },
     ],
     prayerTimes: {
       date: todayIso,
@@ -112,10 +132,11 @@ async function main() {
     town: "Luton",
     slug: "masjid-umar",
     admin: { fullName: "Omar", dateOfBirth: "1988-06-05" },
+    classes: ["Weekday Class", "Weekend Class"],
     students: [
-      { fullName: "Abdullah", dateOfBirth: "2020-02-01" },
-      { fullName: "Safiya", dateOfBirth: "2019-11-09" },
-      { fullName: "Ibrahim", dateOfBirth: "2018-03-17" },
+      { fullName: "Abdullah", dateOfBirth: "2020-02-01", className: "Weekday Class" },
+      { fullName: "Safiya", dateOfBirth: "2019-11-09", className: "Weekend Class" },
+      { fullName: "Ibrahim", dateOfBirth: "2018-03-17", className: "Weekday Class" },
     ],
     prayerTimes: {
       date: todayIso,

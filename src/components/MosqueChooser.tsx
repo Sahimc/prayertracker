@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "@/app/page.module.css";
@@ -62,19 +61,11 @@ export function MosqueChooser() {
     <main className={styles.container}>
       <div className={`glass-panel ${styles.loginCard}`}>
         <div>
-          <h1 className={`text-gradient ${styles.title}`}>Choose your mosque</h1>
-          <p className={styles.subtitle}>Search for your mosque or madrasah to continue. Or create your mosque.</p>
+          <h1 className={`text-gradient ${styles.title}`}>Find your mosque</h1>
+          <p className={styles.subtitle}>Search for your mosque or madrasah to continue.</p>
         </div>
 
         <div className={styles.form}>
-          <Link href="/create-mosque" className={styles.submitBtn} style={{ marginTop: 0 }}>
-            Create your mosque
-          </Link>
-
-          <div className={styles.divider} aria-hidden="true">
-            <span>OR</span>
-          </div>
-
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="mosque-search">
               Search

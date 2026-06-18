@@ -134,6 +134,20 @@ export function HomeScrollCue() {
   );
 }
 
+export function HomeStartMosqueCta() {
+  return (
+    <section className={styles.topCtaWrap} aria-label="Start your mosque">
+      <div className={styles.topCtaCard}>
+        <h2>Ready to track prayers with your students?</h2>
+        <p>Create your mosque, add your first admin, and start using Prayer Tracking today.</p>
+        <Link href="/create-mosque" className={styles.topCtaButton}>
+          Create your mosque
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 type HomeProductShowcaseProps = {
   currentYear: number;
 };

@@ -24,7 +24,7 @@ export function StudentHistoryClient({ organization, student, mosqueSlug }: Stud
         <div>
           <h1 className={`text-gradient ${styles.title}`}>My History</h1>
           <p className={styles.mosqueMeta}>
-            {organization.name} · {organization.town}
+            {organization.name} {"\u00b7"} {organization.town} {"\u00b7"} {student.class.name}
           </p>
         </div>
         <Link href={`/m/${mosqueSlug}/dashboard`} className={styles.backBtn}>

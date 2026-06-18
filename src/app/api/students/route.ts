@@ -8,6 +8,8 @@ export const runtime = "nodejs";
 
 const DUPLICATE_STUDENT_MESSAGE =
   "A student with this name and date of birth already exists. Please add a surname or extra name.";
+const DUPLICATE_CLASS_MESSAGE = "A class with this name already exists for this mosque.";
+const CLASS_REQUIRED_MESSAGE = "Choose a class or create a new class before adding a student.";
 
 export async function GET(request: Request) {
   const auth = await requireApiSession({ role: "admin" });
@@ -35,7 +37,16 @@ export async function GET(request: Request) {
 
     const students = await prisma.student.findMany({
       where: { organizationId: auth.session.organizationId },
-      include: { prayers },
+      include: {
+        class: {
+          select: {
+            id: true,
+            organizationId: true,
+            name: true,
+          },
+        },
+        prayers,
+      },
       orderBy: { fullName: "asc" },
     });
 
@@ -54,9 +65,15 @@ export async function POST(request: Request) {
     const body = await request.json();
     const fullName = cleanDisplayName(String(body.fullName ?? ""));
     const dob = String(body.dob ?? "");
+    const classId = String(body.classId ?? "");
+    const newClassName = cleanDisplayName(String(body.newClassName ?? ""));
 
     if (!fullName) {
       return NextResponse.json({ error: "First Name is required" }, { status: 400 });
+    }
+
+    if (!classId && !newClassName) {
+      return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
     }
 
     const dateOfBirth = parseUkDobToIso(dob);
@@ -80,14 +97,93 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: DUPLICATE_STUDENT_MESSAGE }, { status: 400 });
     }
 
+    const targetClassId = classId;
+    if (newClassName) {
+      const normalizedClassName = normalizeName(newClassName);
+      const existingClass = await prisma.class.findUnique({
+        where: {
+          organizationId_normalizedName: {
+            organizationId: auth.session.organizationId,
+            normalizedName: normalizedClassName,
+          },
+        },
+        select: { id: true },
+      });
+
+      if (existingClass) {
+        return NextResponse.json({ error: DUPLICATE_CLASS_MESSAGE }, { status: 400 });
+      }
+
+      const result = await prisma.$transaction(async (tx) => {
+        const studentClass = await tx.class.create({
+          data: {
+            organizationId: auth.session.organizationId,
+            name: newClassName,
+            normalizedName: normalizedClassName,
+          },
+          select: {
+            id: true,
+            organizationId: true,
+            name: true,
+          },
+        });
+
+        const student = await tx.student.create({
+          data: {
+            organizationId: auth.session.organizationId,
+            classId: studentClass.id,
+            fullName,
+            normalizedName,
+            dateOfBirth,
+          },
+          include: {
+            class: {
+              select: {
+                id: true,
+                organizationId: true,
+                name: true,
+              },
+            },
+            prayers: true,
+          },
+        });
+
+        return { student, class: studentClass };
+      });
+
+      return NextResponse.json(result, { status: 201 });
+    }
+
+    const existingClass = await prisma.class.findFirst({
+      where: {
+        id: targetClassId,
+        organizationId: auth.session.organizationId,
+      },
+      select: { id: true },
+    });
+
+    if (!existingClass) {
+      return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
+    }
+
     const student = await prisma.student.create({
       data: {
         organizationId: auth.session.organizationId,
+        classId: targetClassId,
         fullName,
         normalizedName,
         dateOfBirth,
       },
-      include: { prayers: true },
+      include: {
+        class: {
+          select: {
+            id: true,
+            organizationId: true,
+            name: true,
+          },
+        },
+        prayers: true,
+      },
     });
 
     return NextResponse.json({ student }, { status: 201 });

@@ -82,7 +82,8 @@ export function AdminStudentDetailClient({
         <div>
           <h1 className={`text-gradient ${styles.title}`}>{student.fullName} History</h1>
           <p className={styles.mosqueMeta}>
-            {organization.name} · DOB {formatIsoToUkDate(student.dateOfBirth)}
+            {organization.name} {"\u00b7"} Class {student.class.name} {"\u00b7"} DOB{" "}
+            {formatIsoToUkDate(student.dateOfBirth)}
           </p>
         </div>
         <Link href={`/m/${mosqueSlug}/admin/dashboard`} className={styles.backBtn}>

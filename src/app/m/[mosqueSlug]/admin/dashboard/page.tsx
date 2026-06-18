@@ -49,14 +49,22 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
     redirect(`/m/${mosqueSlug}/admin`);
   }
 
-  const [students, admins, prayerTime] = await Promise.all([
+  const [students, admins, classes, prayerTime] = await Promise.all([
     prisma.student.findMany({
       where: { organizationId: organization.id },
       select: {
         id: true,
         organizationId: true,
+        classId: true,
         fullName: true,
         dateOfBirth: true,
+        class: {
+          select: {
+            id: true,
+            organizationId: true,
+            name: true,
+          },
+        },
         prayers: {
           select: {
             id: true,
@@ -83,6 +91,15 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
         dateOfBirth: true,
       },
       orderBy: { fullName: "asc" },
+    }),
+    prisma.class.findMany({
+      where: { organizationId: organization.id },
+      select: {
+        id: true,
+        organizationId: true,
+        name: true,
+      },
+      orderBy: { name: "asc" },
     }),
     prisma.prayerTime.findUnique({
       where: {
@@ -117,6 +134,7 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
       }}
       initialStudents={students}
       initialAdmins={admins}
+      initialClasses={classes}
       initialPrayerTime={prayerTime}
       mosqueSlug={mosqueSlug}
     />

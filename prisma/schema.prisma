@@ -22,9 +22,24 @@ model Organization {
   createdAt                      DateTime     @default(now())
   updatedAt                      DateTime     @updatedAt
   admins                         Admin[]
+  classes                        Class[]
   students                       Student[]
   prayerLogs                     PrayerLog[]
   prayerTimes                    PrayerTime[]
+}
+
+model Class {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  normalizedName String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  students       Student[]
+
+  @@unique([organizationId, normalizedName])
+  @@index([organizationId])
 }
 
 model Admin {
@@ -44,15 +59,18 @@ model Admin {
 model Student {
   id             String       @id @default(cuid())
   organizationId String
+  classId        String
   fullName       String
   normalizedName String
   dateOfBirth    String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  class          Class        @relation(fields: [classId], references: [id], onDelete: Restrict)
   prayers        PrayerLog[]
 
   @@unique([organizationId, normalizedName, dateOfBirth])
+  @@index([organizationId, classId])
   @@index([organizationId])
 }
 

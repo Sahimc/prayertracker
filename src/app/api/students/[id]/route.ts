@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 
 const DUPLICATE_STUDENT_MESSAGE =
   "A student with this name and date of birth already exists. Please add a surname or extra name.";
+const CLASS_REQUIRED_MESSAGE = "Choose a class for this student.";
 
 export async function GET(
   request: Request,
@@ -46,7 +47,16 @@ export async function GET(
         id,
         organizationId: auth.session.organizationId,
       },
-      include: { prayers },
+      include: {
+        class: {
+          select: {
+            id: true,
+            organizationId: true,
+            name: true,
+          },
+        },
+        prayers,
+      },
     });
 
     if (!student) {
@@ -72,9 +82,14 @@ export async function PATCH(
     const body = await request.json();
     const fullName = cleanDisplayName(String(body.fullName ?? ""));
     const dob = String(body.dob ?? "");
+    const classId = String(body.classId ?? "");
 
     if (!fullName) {
       return NextResponse.json({ error: "First Name is required" }, { status: 400 });
+    }
+
+    if (!classId) {
+      return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
     }
 
     const dateOfBirth = parseUkDobToIso(dob);
@@ -89,6 +104,18 @@ export async function PATCH(
 
     if (!existingStudent) {
       return NextResponse.json({ error: "Student not found" }, { status: 404 });
+    }
+
+    const existingClass = await prisma.class.findFirst({
+      where: {
+        id: classId,
+        organizationId: auth.session.organizationId,
+      },
+      select: { id: true },
+    });
+
+    if (!existingClass) {
+      return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
     }
 
     const normalizedName = normalizeName(fullName);
@@ -111,10 +138,20 @@ export async function PATCH(
       where: { id },
       data: {
         fullName,
+        classId,
         normalizedName,
         dateOfBirth,
       },
-      include: { prayers: { orderBy: { date: "desc" } } },
+      include: {
+        class: {
+          select: {
+            id: true,
+            organizationId: true,
+            name: true,
+          },
+        },
+        prayers: { orderBy: { date: "desc" } },
+      },
     });
 
     return NextResponse.json({ student });

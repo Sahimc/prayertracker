@@ -189,6 +189,43 @@
   gap: 1rem;
 }
 
+.classList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.classChip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid rgba(52, 211, 153, 0.24);
+  border-radius: var(--border-radius-sm);
+  background: rgba(16, 185, 129, 0.12);
+  padding: 0.65rem 0.75rem;
+}
+
+.classChip strong {
+  min-width: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.classChip small {
+  color: #a7f3d0;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.classEmpty {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 .input {
   width: 100%;
   padding: 0.75rem;
@@ -362,7 +399,7 @@
 
 .editForm {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px auto auto;
+  grid-template-columns: minmax(0, 1fr) 140px minmax(130px, 180px) auto auto;
   gap: 0.75rem;
   align-items: center;
   padding: 1rem;

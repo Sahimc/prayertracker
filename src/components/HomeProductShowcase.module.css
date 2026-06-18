@@ -4,6 +4,59 @@
   padding: 1.5rem 1rem max(7rem, env(safe-area-inset-bottom));
 }
 
+.topCtaWrap {
+  width: min(100%, 1040px);
+  margin: -4rem auto 0;
+  padding: 0 1rem;
+}
+
+.topCtaCard {
+  margin: 0 auto;
+  padding: 1.45rem;
+  border: 1px solid rgba(45, 212, 191, 0.42);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(34, 197, 94, 0.25), transparent 34%),
+    radial-gradient(circle at 86% 8%, rgba(14, 165, 233, 0.3), transparent 38%),
+    linear-gradient(135deg, rgba(8, 47, 73, 0.78), rgba(15, 23, 42, 0.9));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 24px 70px rgba(14, 165, 233, 0.14),
+    0 20px 60px rgba(20, 184, 166, 0.14);
+  text-align: center;
+}
+
+.topCtaCard h2 {
+  max-width: 620px;
+  margin: 0 auto 0.75rem;
+  color: var(--text-primary);
+  font-size: clamp(1.65rem, 7vw, 2.8rem);
+  line-height: 0.98;
+}
+
+.topCtaCard p:not(.eyebrow) {
+  max-width: 580px;
+  margin: 0 auto 1.15rem;
+  color: #c7d2fe;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.topCtaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.9rem 1rem;
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(135deg, #14b8a6, #22c55e);
+  color: white;
+  font-weight: 900;
+  box-shadow: 0 16px 36px rgba(34, 197, 94, 0.24);
+}
+
 .scrollCue {
   position: relative;
   z-index: 2;
@@ -11,7 +64,7 @@
   width: fit-content;
   align-items: center;
   gap: 0.55rem;
-  margin: -4.25rem auto 2rem;
+  margin: 1.35rem auto 2rem;
   padding: 0.58rem 0.85rem;
   border: 1px solid rgba(125, 211, 252, 0.35);
   border-radius: 999px;
@@ -754,6 +807,19 @@
     padding-inline: 2rem;
   }
 
+  .topCtaWrap {
+    padding-inline: 2rem;
+  }
+
+  .topCtaCard {
+    padding: 2rem;
+  }
+
+  .topCtaButton {
+    width: auto;
+    min-width: 220px;
+  }
+
   .promiseCard {
     padding: 1.75rem 2rem;
   }
@@ -801,8 +867,12 @@
 }
 
 @media (max-width: 520px) {
+  .topCtaWrap {
+    margin-top: -2.75rem;
+  }
+
   .scrollCue {
-    margin-top: -3.5rem;
+    margin-top: 1rem;
   }
 }
 

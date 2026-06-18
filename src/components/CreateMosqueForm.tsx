@@ -1,22 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import styles from "@/app/page.module.css";
 
 type CreateMosqueResponse = {
+  organization?: {
+    id: string;
+    name: string;
+    town: string;
+    slug: string;
+  };
   redirectTo?: string;
   error?: string;
 };
 
+type CreatedMosque = {
+  name: string;
+  town: string;
+  slug: string;
+  redirectTo: string;
+};
+
 export function CreateMosqueForm() {
-  const router = useRouter();
   const [mosqueName, setMosqueName] = useState("");
   const [town, setTown] = useState("");
   const [adminName, setAdminName] = useState("");
   const [adminDob, setAdminDob] = useState("");
   const [error, setError] = useState("");
+  const [shareStatus, setShareStatus] = useState("");
+  const [createdMosque, setCreatedMosque] = useState<CreatedMosque | null>(null);
   const [loading, setLoading] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,16 +67,113 @@ export function CreateMosqueForm() {
       });
 
       const data = (await response.json()) as CreateMosqueResponse;
-      if (!response.ok || !data.redirectTo) {
+      if (!response.ok || !data.redirectTo || !data.organization) {
         throw new Error(data.error || "Could not create mosque");
       }
 
-      router.push(data.redirectTo);
+      setCreatedMosque({
+        name: data.organization.name,
+        town: data.organization.town,
+        slug: data.organization.slug,
+        redirectTo: data.redirectTo,
+      });
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Could not create mosque");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleShareMosque() {
+    if (!createdMosque) return;
+
+    const mosqueUrl = `https://prayertracking.com/m/${createdMosque.slug}`;
+    const shareText = `${createdMosque.name} is now on Prayer Tracking. Use this link to log in.`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${createdMosque.name} on Prayer Tracking`,
+          text: shareText,
+          url: mosqueUrl,
+        });
+        setShareStatus("Share sheet opened.");
+        return;
+      }
+
+      await navigator.clipboard.writeText(mosqueUrl);
+      setShareStatus("Unique URL copied.");
+    } catch {
+      try {
+        await navigator.clipboard.writeText(mosqueUrl);
+        setShareStatus("Unique URL copied.");
+      } catch {
+        setShareStatus("Could not copy automatically. Press and hold the URL to copy it.");
+      }
+    }
+  }
+
+  async function handleCopyMosqueUrl() {
+    if (!createdMosque) return;
+
+    try {
+      await navigator.clipboard.writeText(`https://prayertracking.com/m/${createdMosque.slug}`);
+      setShareStatus("Unique URL copied.");
+    } catch {
+      setShareStatus("Could not copy automatically. Press and hold the URL to copy it.");
+    }
+  }
+
+  if (createdMosque) {
+    const mosqueUrl = `https://prayertracking.com/m/${createdMosque.slug}`;
+
+    return (
+      <main className={styles.container}>
+        <div className={`glass-panel ${styles.loginCard}`}>
+          <div>
+            <p className={styles.successEyebrow}>Mosque created</p>
+            <h1 className={`text-gradient ${styles.title}`}>{createdMosque.name}</h1>
+            <p className={styles.subtitle}>
+              {createdMosque.town} now has its own unique Prayer Tracking URL.
+            </p>
+          </div>
+
+          <div className={styles.uniqueUrlCard}>
+            <span>Your unique URL</span>
+            <strong>{mosqueUrl}</strong>
+            <p>Share this with students, parents, and teachers so they can use the correct mosque page.</p>
+          </div>
+
+          <p className={styles.adminLoginNote}>
+            Admins can log in later from Admin Login on this mosque page.
+            <Link href={`/m/${createdMosque.slug}/admin`}> Open admin login</Link>
+          </p>
+
+          <div className={styles.shareActions}>
+            <button type="button" className={styles.submitBtn} onClick={handleShareMosque}>
+              Share URL
+            </button>
+            <button
+              type="button"
+              className={styles.copyBtn}
+              onClick={handleCopyMosqueUrl}
+            >
+              Copy link
+            </button>
+          </div>
+
+          {shareStatus && <p className={styles.success}>{shareStatus}</p>}
+
+          <Link href={createdMosque.redirectTo} className={styles.submitBtn}>
+            Go to your admin dashboard
+          </Link>
+
+          <Link href="/" className={styles.secondaryLink}>
+            Back to find your mosque
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -184,7 +294,7 @@ export function CreateMosqueForm() {
         </form>
 
         <Link href="/" className={styles.secondaryLink}>
-          Back to mosque chooser
+          Back to find your mosque
         </Link>
       </div>
     </main>

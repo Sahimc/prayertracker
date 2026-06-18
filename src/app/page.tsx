@@ -1,5 +1,5 @@
 import { MosqueChooser } from "@/components/MosqueChooser";
-import { HomeProductShowcase, HomeScrollCue } from "@/components/HomeProductShowcase";
+import { HomeProductShowcase, HomeScrollCue, HomeStartMosqueCta } from "@/components/HomeProductShowcase";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +9,7 @@ export default function Home() {
   return (
     <>
       <MosqueChooser />
+      <HomeStartMosqueCta />
       <HomeScrollCue />
       <HomeProductShowcase currentYear={currentYear} />
     </>

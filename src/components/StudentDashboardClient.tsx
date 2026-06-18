@@ -152,7 +152,7 @@ export function StudentDashboardClient({
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Salaam, {firstName}</h1>
           <p className={styles.mosqueMeta}>
-            {organization.name} · {organization.town}
+            {organization.name} {"\u00b7"} {organization.town} {"\u00b7"} {student.class.name}
           </p>
         </div>
         <button onClick={handleLogout} className={styles.logoutBtn}>
