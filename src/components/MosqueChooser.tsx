@@ -58,7 +58,7 @@ export function MosqueChooser() {
   }, [organizations, query]);
 
   return (
-    <main className={styles.container}>
+    <main className={styles.homeContainer}>
       <div className={`glass-panel ${styles.loginCard}`}>
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Find your mosque</h1>

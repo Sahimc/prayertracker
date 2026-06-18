@@ -6,11 +6,23 @@
 
 .topCtaWrap {
   width: min(100%, 1040px);
-  margin: -4rem auto 0;
+  margin: 0 auto;
   padding: 0 1rem;
 }
 
+.orDivider {
+  text-align: center;
+  color: var(--text-primary, #f8fafc);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
 .topCtaCard {
+  position: relative;
   margin: 0 auto;
   padding: 1.45rem;
   border: 1px solid rgba(45, 212, 191, 0.42);
@@ -26,9 +38,27 @@
   text-align: center;
 }
 
+.freeLabel {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #fbbf24;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  text-transform: uppercase;
+}
+
 .topCtaCard h2 {
   max-width: 620px;
-  margin: 0 auto 0.75rem;
+  margin: 0 auto 1.75rem;
   color: var(--text-primary);
   font-size: clamp(1.65rem, 7vw, 2.8rem);
   line-height: 0.98;
@@ -64,7 +94,7 @@
   width: fit-content;
   align-items: center;
   gap: 0.55rem;
-  margin: 1.35rem auto 2rem;
+  margin: 2.5rem auto max(8rem, 25vh);
   padding: 0.58rem 0.85rem;
   border: 1px solid rgba(125, 211, 252, 0.35);
   border-radius: 999px;
@@ -748,7 +778,7 @@
   color: var(--text-primary);
   font-size: clamp(1.55rem, 6vw, 2.5rem);
   line-height: 1.02;
-  margin-bottom: 0.7rem;
+  margin-bottom: 1.75rem;
 }
 
 .bottomCta p:not(.eyebrow) {
@@ -868,11 +898,11 @@
 
 @media (max-width: 520px) {
   .topCtaWrap {
-    margin-top: -2.75rem;
+    margin-top: 0;
   }
 
   .scrollCue {
-    margin-top: 1rem;
+    margin-top: 2.5rem;
   }
 }
 

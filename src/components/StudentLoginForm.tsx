@@ -85,7 +85,7 @@ export function StudentLoginForm({ organization }: StudentLoginFormProps) {
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="student-name">
-              First Name
+              Student First Name
             </label>
             <input
               id="student-name"

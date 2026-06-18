@@ -137,9 +137,10 @@ export function HomeScrollCue() {
 export function HomeStartMosqueCta() {
   return (
     <section className={styles.topCtaWrap} aria-label="Start your mosque">
+      <div className={styles.orDivider}>OR</div>
       <div className={styles.topCtaCard}>
+        <div className={styles.freeLabel}>FREE Forever</div>
         <h2>Ready to track prayers with your students?</h2>
-        <p>Create your mosque, add your first admin, and start using Prayer Tracking today.</p>
         <Link href="/create-mosque" className={styles.topCtaButton}>
           Create your mosque
         </Link>
@@ -469,7 +470,6 @@ export function HomeProductShowcase({ currentYear }: HomeProductShowcaseProps) {
       <div className={styles.bottomCta}>
         <p className={styles.eyebrow}>Start your mosque</p>
         <h2>Ready to track prayers with your students?</h2>
-        <p>Create your mosque, add your first admin, and start using Prayer Tracking today.</p>
         <Link href="/create-mosque" className={styles.bottomCtaButton}>
           Create your mosque
         </Link>
