@@ -819,7 +819,6 @@ export function AdminDashboardClient({
               {admins.map((admin) => (
                 <span key={admin.id} className={styles.adminChip}>
                   <strong>{admin.fullName}</strong>
-                  <small>DOB {formatIsoToUkDate(admin.dateOfBirth)}</small>
                 </span>
               ))}
               {admins.length === 0 && <p className={styles.classEmpty}>No admins have been added yet.</p>}
