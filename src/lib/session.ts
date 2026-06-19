@@ -17,7 +17,11 @@ export type SessionPayload = {
 type SessionInput = Omit<SessionPayload, "expiresAt">;
 
 function getSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET;
+  const secret =
+    process.env.SESSION_SECRET ||
+    process.env.AUTH_SECRET ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL_UNPOOLED;
   if (secret) return secret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("SESSION_SECRET is required in production.");

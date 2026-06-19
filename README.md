@@ -22,7 +22,7 @@ Required environment variables:
 
 - `POSTGRES_PRISMA_URL`
 - `DATABASE_URL_UNPOOLED`
-- `SESSION_SECRET` for production session signing
+- `SESSION_SECRET` for production session signing. If it is not set, the app falls back to an existing server-only database secret so production sessions still work, but an explicit `SESSION_SECRET` is preferred.
 
 For local/dev only, reset with:
 
