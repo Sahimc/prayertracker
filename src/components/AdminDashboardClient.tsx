@@ -122,6 +122,9 @@ export function AdminDashboardClient({
   const [prayerSettings, setPrayerSettings] = useState<PrayerSettingsSummary>(initialPrayerSettings);
   const [prayerSettingsLoading, setPrayerSettingsLoading] = useState(false);
   const [showDailyReminder, setShowDailyReminder] = useState(true);
+  const [studentPendingDelete, setStudentPendingDelete] = useState<{ id: string; name: string } | null>(null);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const newDateInputRef = useRef<HTMLInputElement>(null);
@@ -357,22 +360,40 @@ export function AdminDashboardClient({
     }
   }
 
-  async function deleteStudent(id: string, name: string) {
-    if (!window.confirm(`Are you sure you want to permanently delete ${name} and all their prayer history?`)) return;
+  function openDeleteStudentModal(id: string, name: string) {
+    setStudentPendingDelete({ id, name });
+    setDeleteConfirmationText("");
     setError("");
     setSuccess("");
+  }
+
+  function closeDeleteStudentModal() {
+    if (deleteLoading) return;
+    setStudentPendingDelete(null);
+    setDeleteConfirmationText("");
+  }
+
+  async function confirmDeleteStudent() {
+    if (!studentPendingDelete || deleteConfirmationText.trim().toUpperCase() !== "DELETE") return;
+    setError("");
+    setSuccess("");
+    setDeleteLoading(true);
 
     try {
-      const response = await fetch(`/api/students/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/students/${studentPendingDelete.id}`, { method: "DELETE" });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) {
         throw new Error(data.error || "Failed to delete student");
       }
 
-      setStudents((currentStudents) => currentStudents.filter((student) => student.id !== id));
+      setStudents((currentStudents) => currentStudents.filter((student) => student.id !== studentPendingDelete.id));
+      setStudentPendingDelete(null);
+      setDeleteConfirmationText("");
       setSuccess("Student deleted.");
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Failed to delete student");
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -500,6 +521,48 @@ export function AdminDashboardClient({
         </div>
       )}
 
+      {studentPendingDelete && (
+        <div className={styles.modalOverlay} role="presentation">
+          <div
+            className={styles.reminderModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-student-title"
+            aria-describedby="delete-student-description"
+          >
+            <p className={styles.deleteEyebrow}>Permanent delete</p>
+            <h2 id="delete-student-title">Delete {studentPendingDelete.name}?</h2>
+            <p id="delete-student-description">
+              This will permanently delete this student and all of their prayer history. This cannot be undone.
+            </p>
+            <label className={styles.confirmLabel}>
+              <span>Type DELETE to confirm</span>
+              <input
+                type="text"
+                className={styles.input}
+                value={deleteConfirmationText}
+                onChange={(event) => setDeleteConfirmationText(event.target.value)}
+                autoFocus
+                autoComplete="off"
+              />
+            </label>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.btnSecondary} onClick={closeDeleteStudentModal}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.deleteConfirmBtn}
+                onClick={confirmDeleteStudent}
+                disabled={deleteConfirmationText.trim().toUpperCase() !== "DELETE" || deleteLoading}
+              >
+                {deleteLoading ? "Deleting..." : "Delete Student"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className={styles.header}>
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Admin Dashboard</h1>
@@ -559,42 +622,6 @@ export function AdminDashboardClient({
 
       <div className={styles.grid}>
         <div className={styles.sidebar}>
-          <div className={`glass-panel ${styles.card}`}>
-            <h2 className={styles.cardTitle}>Classes</h2>
-            <p className={styles.helperText}>Every student must belong to a class.</p>
-            <form className={styles.form} onSubmit={handleCreateClass}>
-              <input
-                type="text"
-                placeholder="Class name"
-                className={styles.input}
-                value={newClassName}
-                onChange={(event) => setNewClassName(event.target.value)}
-                required
-              />
-              <button type="submit" className={styles.submitBtn}>
-                Create Class
-              </button>
-            </form>
-            <div className={styles.classList}>
-              {classes.map((studentClass) => {
-                const studentCount = classStudentCounts[studentClass.id] ?? 0;
-                return (
-                  <span key={studentClass.id} className={styles.classChip}>
-                    <strong>{studentClass.name}</strong>
-                    <small>
-                      {studentCount} {studentCount === 1 ? "student" : "students"}
-                    </small>
-                  </span>
-                );
-              })}
-              {classes.length === 0 && (
-                <p className={styles.classEmpty}>
-                  Create your first class here, or create it while adding the first student.
-                </p>
-              )}
-            </div>
-          </div>
-
           <div className={`glass-panel ${styles.card}`}>
             <h2 className={styles.cardTitle}>Add Student</h2>
             <form className={styles.form} onSubmit={handleCreateStudent}>
@@ -698,6 +725,42 @@ export function AdminDashboardClient({
                 Create Student
               </button>
             </form>
+          </div>
+
+          <div className={`glass-panel ${styles.card}`}>
+            <h2 className={styles.cardTitle}>Classes</h2>
+            <p className={styles.helperText}>Every student must belong to a class.</p>
+            <form className={styles.form} onSubmit={handleCreateClass}>
+              <input
+                type="text"
+                placeholder="Class name"
+                className={styles.input}
+                value={newClassName}
+                onChange={(event) => setNewClassName(event.target.value)}
+                required
+              />
+              <button type="submit" className={styles.submitBtn}>
+                Create New Class
+              </button>
+            </form>
+            <div className={styles.classList}>
+              {classes.map((studentClass) => {
+                const studentCount = classStudentCounts[studentClass.id] ?? 0;
+                return (
+                  <span key={studentClass.id} className={styles.classChip}>
+                    <strong>{studentClass.name}</strong>
+                    <small>
+                      {studentCount} {studentCount === 1 ? "student" : "students"}
+                    </small>
+                  </span>
+                );
+              })}
+              {classes.length === 0 && (
+                <p className={styles.classEmpty}>
+                  Create your first class here, or create it while adding the first student.
+                </p>
+              )}
+            </div>
           </div>
 
           <div className={`glass-panel ${styles.card}`}>
@@ -950,14 +1013,14 @@ export function AdminDashboardClient({
                   </div>
                   <div className={styles.actionRow}>
                     <Link href={`/m/${mosqueSlug}/admin/student/${student.id}`} className={styles.btnSecondary}>
-                      Details
+                      History
                     </Link>
                     <button type="button" onClick={() => startEdit(student)} className={styles.btnSecondary}>
                       Edit
                     </button>
                     <button
                       type="button"
-                      onClick={() => deleteStudent(student.id, student.fullName)}
+                      onClick={() => openDeleteStudentModal(student.id, student.fullName)}
                       className={styles.deleteBtn}
                     >
                       Delete
