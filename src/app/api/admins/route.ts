@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export const runtime = "nodejs";
 
 const DUPLICATE_ADMIN_MESSAGE =
-  "An admin with this name and date of birth already exists for this mosque.";
+  "An admin with this name and birthday already exists for this mosque.";
 
 export async function GET() {
   const auth = await requireApiSession({ role: "admin" });
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     const dateOfBirth = parseUkDobToIso(dob);
     if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the date of birth as DD/MM/YYYY" }, { status: 400 });
+      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
     }
 
     const normalizedName = normalizeName(fullName);

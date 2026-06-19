@@ -976,7 +976,7 @@ export function AdminDashboardClient({
                   <div>
                     <h3 className={styles.studentName}>{student.fullName}</h3>
                     <p className={styles.studentMeta}>
-                      Class {student.class.name} {"\u00b7"} DOB {formatIsoToUkDate(student.dateOfBirth)}{" "}
+                      Class {student.class.name} {"\u00b7"} Birthday {formatIsoToUkDate(student.dateOfBirth)}{" "}
                       {"\u00b7"} {student.todayCompleted}/5 today {"\u00b7"}{" "}
                       {student.totalPoints} pts
                     </p>

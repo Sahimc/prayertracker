@@ -7,7 +7,7 @@ import { isValidIsoDate, parseUkDobToIso } from "@/lib/dates";
 export const runtime = "nodejs";
 
 const DUPLICATE_STUDENT_MESSAGE =
-  "A student with this name and date of birth already exists. Please add a surname or extra name.";
+  "A student with this name and birthday already exists. Please add a surname or extra name.";
 const DUPLICATE_CLASS_MESSAGE = "A class with this name already exists for this mosque.";
 const CLASS_REQUIRED_MESSAGE = "Choose a class or create a new class before adding a student.";
 
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
     const dateOfBirth = parseUkDobToIso(dob);
     if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the date of birth as DD/MM/YYYY" }, { status: 400 });
+      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
     }
 
     const normalizedName = normalizeName(fullName);

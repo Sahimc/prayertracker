@@ -7,7 +7,7 @@ import { isValidIsoDate, parseUkDobToIso } from "@/lib/dates";
 export const runtime = "nodejs";
 
 const DUPLICATE_STUDENT_MESSAGE =
-  "A student with this name and date of birth already exists. Please add a surname or extra name.";
+  "A student with this name and birthday already exists. Please add a surname or extra name.";
 const CLASS_REQUIRED_MESSAGE = "Choose a class for this student.";
 
 export async function GET(
@@ -94,7 +94,7 @@ export async function PATCH(
 
     const dateOfBirth = parseUkDobToIso(dob);
     if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the date of birth as DD/MM/YYYY" }, { status: 400 });
+      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
     }
 
     const existingStudent = await prisma.student.findFirst({

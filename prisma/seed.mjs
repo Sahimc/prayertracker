@@ -161,8 +161,8 @@ async function main() {
   });
 
   console.log("Seeded organizations:");
-  console.log("- Green Lane Masjid (East Ham), admin Aisha, DOB 01/02/1990");
-  console.log("- Masjid Umar (Luton), admin Omar, DOB 05/06/1988");
+  console.log("- Green Lane Masjid (East Ham), admin Aisha, Birthday 01/02/1990");
+  console.log("- Masjid Umar (Luton), admin Omar, Birthday 05/06/1988");
 }
 
 main()

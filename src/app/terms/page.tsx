@@ -17,7 +17,7 @@ const TERMS_SECTIONS = [
   },
   {
     title: "Accurate information",
-    body: "Users should enter accurate names, dates of birth, prayer records, and mosque details. Admins should only add people they are authorised to manage.",
+    body: "Users should enter accurate names, birthdays, prayer records, and mosque details. Admins should only add people they are authorised to manage.",
   },
   {
     title: "Children and permission",

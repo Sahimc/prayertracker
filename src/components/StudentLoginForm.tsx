@@ -100,7 +100,7 @@ export function StudentLoginForm({ organization }: StudentLoginFormProps) {
 
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="student-dob">
-              Date of Birth
+              Birthday
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input

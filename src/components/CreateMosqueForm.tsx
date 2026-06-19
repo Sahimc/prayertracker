@@ -232,7 +232,7 @@ export function CreateMosqueForm() {
 
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="admin-dob">
-              First admin date of birth
+              First admin birthday
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input

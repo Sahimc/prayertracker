@@ -55,21 +55,21 @@ Seed data creates two mosques.
 
 Green Lane Masjid (East Ham), slug `green-lane-masjid`:
 
-- Admin: `Aisha`, DOB `01/02/1990`
+- Admin: `Aisha`, Birthday `01/02/1990`
 - Classes: `Beginners`, `Level 1`
-- Student: `Abdullah`, DOB `01/02/2020`, class `Beginners`
-- Student: `Maryam`, DOB `15/05/2019`, class `Beginners`
-- Student: `Yusuf`, DOB `22/08/2018`, class `Level 1`
+- Student: `Abdullah`, Birthday `01/02/2020`, class `Beginners`
+- Student: `Maryam`, Birthday `15/05/2019`, class `Beginners`
+- Student: `Yusuf`, Birthday `22/08/2018`, class `Level 1`
 
 Masjid Umar (Luton), slug `masjid-umar`:
 
-- Admin: `Omar`, DOB `05/06/1988`
+- Admin: `Omar`, Birthday `05/06/1988`
 - Classes: `Weekday Class`, `Weekend Class`
-- Student: `Abdullah`, DOB `01/02/2020`, class `Weekday Class`
-- Student: `Safiya`, DOB `09/11/2019`, class `Weekend Class`
-- Student: `Ibrahim`, DOB `17/03/2018`, class `Weekday Class`
+- Student: `Abdullah`, Birthday `01/02/2020`, class `Weekday Class`
+- Student: `Safiya`, Birthday `09/11/2019`, class `Weekend Class`
+- Student: `Ibrahim`, Birthday `17/03/2018`, class `Weekday Class`
 
-All DOB entry in the UI is UK format `DD/MM/YYYY`. The database stores DOB values as normalized `YYYY-MM-DD`.
+All birthday entry in the UI is UK format `DD/MM/YYYY`. The database stores birthday values as normalized `YYYY-MM-DD`.
 
 ## Classes
 

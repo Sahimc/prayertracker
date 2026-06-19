@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     const dateOfBirth = parseUkDobToIso(dob);
     if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the date of birth as DD/MM/YYYY" }, { status: 400 });
+      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
     }
 
     const organization = await prisma.organization.findUnique({

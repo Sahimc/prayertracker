@@ -82,7 +82,7 @@ export function AdminStudentDetailClient({
         <div>
           <h1 className={`text-gradient ${styles.title}`}>{student.fullName} History</h1>
           <p className={styles.mosqueMeta}>
-            {organization.name} {"\u00b7"} Class {student.class.name} {"\u00b7"} DOB{" "}
+            {organization.name} {"\u00b7"} Class {student.class.name} {"\u00b7"} Birthday{" "}
             {formatIsoToUkDate(student.dateOfBirth)}
           </p>
         </div>

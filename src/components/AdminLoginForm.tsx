@@ -100,7 +100,7 @@ export function AdminLoginForm({ organization }: AdminLoginFormProps) {
 
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="admin-dob">
-              Date of Birth
+              Birthday
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <input
