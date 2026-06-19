@@ -64,7 +64,6 @@ type AdminResponse = {
   error?: string;
 };
 
-type PeopleMode = "students" | "admins";
 type StudentClassMode = "existing" | "new";
 type FilterMode = "all" | "completed" | "incomplete";
 type SortMode = "name" | "points" | "mostToday" | "leastToday";
@@ -110,7 +109,6 @@ export function AdminDashboardClient({
   const [newAdminFullName, setNewAdminFullName] = useState("");
   const [newAdminDob, setNewAdminDob] = useState("");
   const [query, setQuery] = useState("");
-  const [peopleMode, setPeopleMode] = useState<PeopleMode>("students");
   const [classFilterId, setClassFilterId] = useState("all");
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [sortMode, setSortMode] = useState<SortMode>("name");
@@ -191,17 +189,6 @@ export function AdminDashboardClient({
         return a.fullName.localeCompare(b.fullName);
       });
   }, [classFilterId, filterMode, query, sortMode, studentsWithStats]);
-
-  const filteredAdmins = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return admins
-      .filter((admin) => {
-        if (!normalizedQuery) return true;
-        return admin.fullName.toLowerCase().includes(normalizedQuery);
-      })
-      .sort((a, b) => a.fullName.localeCompare(b.fullName));
-  }, [admins, query]);
 
   const summary = useMemo(() => {
     const totalStudents = studentsWithStats.length;
@@ -316,7 +303,6 @@ export function AdminDashboardClient({
       setAdmins((currentAdmins) => [...currentAdmins, data.admin as AdminSummary]);
       setNewAdminFullName("");
       setNewAdminDob("");
-      setPeopleMode("admins");
       setSuccess("Admin added.");
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Failed to create admin");
@@ -828,6 +814,16 @@ export function AdminDashboardClient({
                 Create Admin
               </button>
             </form>
+            <div className={styles.adminList}>
+              <p className={styles.listTitle}>Current admins</p>
+              {admins.map((admin) => (
+                <span key={admin.id} className={styles.adminChip}>
+                  <strong>{admin.fullName}</strong>
+                  <small>DOB {formatIsoToUkDate(admin.dateOfBirth)}</small>
+                </span>
+              ))}
+              {admins.length === 0 && <p className={styles.classEmpty}>No admins have been added yet.</p>}
+            </div>
           </div>
 
           <div className={`glass-panel ${styles.card}`}>
@@ -930,21 +926,11 @@ export function AdminDashboardClient({
             <div className={styles.controls}>
               <input
                 type="search"
-                placeholder={peopleMode === "students" ? "Search students" : "Search admins"}
+                placeholder="Search students"
                 className={styles.input}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
-              <select
-                className={styles.input}
-                value={peopleMode}
-                onChange={(event) => setPeopleMode(event.target.value as PeopleMode)}
-              >
-                <option value="students">Students</option>
-                <option value="admins">Admins</option>
-              </select>
-              {peopleMode === "students" && (
-                <>
               <select
                 className={styles.input}
                 value={filterMode}
@@ -976,27 +962,12 @@ export function AdminDashboardClient({
                 <option value="mostToday">Most prayers today</option>
                 <option value="leastToday">Least prayers today</option>
               </select>
-                </>
-              )}
             </div>
             {error && <p className={styles.error}>{error}</p>}
             {success && <p className={styles.success}>{success}</p>}
           </div>
 
-          {peopleMode === "admins" && filteredAdmins.map((admin) => (
-            <div key={admin.id} className={`glass-panel ${styles.studentCard}`}>
-              <div className={styles.studentHeader}>
-                <div>
-                  <h3 className={styles.studentName}>{admin.fullName}</h3>
-                  <p className={styles.studentMeta}>
-                    DOB {formatIsoToUkDate(admin.dateOfBirth)} {"\u00b7"} Admin
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {peopleMode === "students" && filteredStudents.map((student) => {
+          {filteredStudents.map((student) => {
             const todayLog = getTodayLog(student, todayDateStr);
             const isEditing = editingStudentId === student.id;
 
@@ -1126,15 +1097,9 @@ export function AdminDashboardClient({
             );
           })}
 
-          {peopleMode === "students" && filteredStudents.length === 0 && (
+          {filteredStudents.length === 0 && (
             <div className={`glass-panel ${styles.card}`} style={{ textAlign: "center", color: "var(--text-secondary)" }}>
               No students found.
-            </div>
-          )}
-
-          {peopleMode === "admins" && filteredAdmins.length === 0 && (
-            <div className={`glass-panel ${styles.card}`} style={{ textAlign: "center", color: "var(--text-secondary)" }}>
-              No admins found.
             </div>
           )}
         </div>
