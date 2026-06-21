@@ -120,6 +120,8 @@ export function AdminDashboardClient({
   const [prayerSettings, setPrayerSettings] = useState<PrayerSettingsSummary>(initialPrayerSettings);
   const [prayerSettingsLoading, setPrayerSettingsLoading] = useState(false);
   const [showDailyReminder, setShowDailyReminder] = useState(true);
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [studentPendingDelete, setStudentPendingDelete] = useState<{ id: string; name: string } | null>(null);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -277,6 +279,7 @@ export function AdminDashboardClient({
       setNewFullName("");
       setNewDob("");
       setNewStudentNewClassName("");
+      setShowAddStudentModal(false);
       setSuccess("Student added.");
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Failed to create student");
@@ -303,6 +306,7 @@ export function AdminDashboardClient({
       setAdmins((currentAdmins) => [...currentAdmins, data.admin as AdminSummary]);
       setNewAdminFullName("");
       setNewAdminDob("");
+      setShowAddAdminModal(false);
       setSuccess("Admin added.");
     } catch (createError) {
       setError(createError instanceof Error ? createError.message : "Failed to create admin");
@@ -549,6 +553,238 @@ export function AdminDashboardClient({
         </div>
       )}
 
+      {showAddStudentModal && (
+        <div className={styles.fullScreenModalOverlay} role="presentation">
+          <section
+            className={styles.fullScreenModalPanel}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-student-title"
+          >
+            <div className={styles.fullScreenModalHeader}>
+              <div>
+                <p className={styles.modalEyebrow}>Student setup</p>
+                <h2 id="add-student-title">Add Student</h2>
+                <p>Add a child and place them into a class.</p>
+              </div>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => setShowAddStudentModal(false)}
+                aria-label="Close add student form"
+              >
+                Close
+              </button>
+            </div>
+            <form className={`${styles.form} ${styles.fullScreenForm}`} onSubmit={handleCreateStudent}>
+              <label className={styles.fieldLabel}>
+                <span>Student name</span>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  className={styles.input}
+                  value={newFullName}
+                  onChange={(event) => setNewFullName(event.target.value)}
+                  required
+                />
+              </label>
+              <label className={styles.fieldLabel}>
+                <span>Birthday</span>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="DD/MM/YYYY"
+                    className={styles.input}
+                    value={newDob}
+                    onChange={(event) => handleDobChange(event, setNewDob)}
+                    required
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <input
+                    type="date"
+                    ref={newDateInputRef}
+                    onChange={(e) => handleNativeDateChange(e, setNewDob)}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      width: '24px',
+                      height: '24px',
+                      opacity: 0,
+                      cursor: 'pointer',
+                      zIndex: 2
+                    }}
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      width: '20px',
+                      height: '20px',
+                      color: 'var(--text-secondary)',
+                      pointerEvents: 'none',
+                      zIndex: 1
+                    }}
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+              </label>
+              {classes.length > 0 && (
+                <label className={styles.fieldLabel}>
+                  <span>Class</span>
+                  <select
+                    className={styles.input}
+                    value={newStudentClassMode === "new" ? "__new__" : newStudentClassId}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (value === "__new__") {
+                        setNewStudentClassMode("new");
+                        setNewStudentClassId("");
+                        return;
+                      }
+
+                      setNewStudentClassMode("existing");
+                      setNewStudentClassId(value);
+                    }}
+                    required
+                  >
+                    <option value="">Choose class</option>
+                    {classes.map((studentClass) => (
+                      <option key={studentClass.id} value={studentClass.id}>
+                        {studentClass.name}
+                      </option>
+                    ))}
+                    <option value="__new__">Create new class</option>
+                  </select>
+                </label>
+              )}
+              {(classes.length === 0 || newStudentClassMode === "new") && (
+                <label className={styles.fieldLabel}>
+                  <span>{classes.length === 0 ? "First class" : "New class"}</span>
+                  <input
+                    type="text"
+                    placeholder={classes.length === 0 ? "First class name" : "New class name"}
+                    className={styles.input}
+                    value={newStudentNewClassName}
+                    onChange={(event) => setNewStudentNewClassName(event.target.value)}
+                    required
+                  />
+                </label>
+              )}
+              <button type="submit" className={styles.submitBtn}>
+                Create Student
+              </button>
+            </form>
+          </section>
+        </div>
+      )}
+
+      {showAddAdminModal && (
+        <div className={styles.fullScreenModalOverlay} role="presentation">
+          <section
+            className={styles.fullScreenModalPanel}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-admin-title"
+          >
+            <div className={styles.fullScreenModalHeader}>
+              <div>
+                <p className={styles.modalEyebrow}>Teacher access</p>
+                <h2 id="add-admin-title">Add Admin</h2>
+                <p>Admins can be teachers too.</p>
+              </div>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => setShowAddAdminModal(false)}
+                aria-label="Close add admin form"
+              >
+                Close
+              </button>
+            </div>
+            <form className={`${styles.form} ${styles.fullScreenForm}`} onSubmit={handleCreateAdmin}>
+              <label className={styles.fieldLabel}>
+                <span>Admin name</span>
+                <input
+                  type="text"
+                  placeholder="Admin Name"
+                  className={styles.input}
+                  value={newAdminFullName}
+                  onChange={(event) => setNewAdminFullName(event.target.value)}
+                  required
+                />
+              </label>
+              <label className={styles.fieldLabel}>
+                <span>Birthday</span>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="DD/MM/YYYY"
+                    className={styles.input}
+                    value={newAdminDob}
+                    onChange={(event) => handleDobChange(event, setNewAdminDob)}
+                    required
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <input
+                    type="date"
+                    ref={newAdminDateInputRef}
+                    onChange={(event) => handleNativeDateChange(event, setNewAdminDob)}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      width: '24px',
+                      height: '24px',
+                      opacity: 0,
+                      cursor: 'pointer',
+                      zIndex: 2
+                    }}
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      width: '20px',
+                      height: '20px',
+                      color: 'var(--text-secondary)',
+                      pointerEvents: 'none',
+                      zIndex: 1
+                    }}
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+              </label>
+              <button type="submit" className={styles.submitBtn}>
+                Create Admin
+              </button>
+            </form>
+          </section>
+        </div>
+      )}
+
       <div className={styles.header}>
         <div>
           <h1 className={`text-gradient ${styles.title}`}>Admin Dashboard</h1>
@@ -610,107 +846,18 @@ export function AdminDashboardClient({
         <div className={styles.sidebar}>
           <div className={`glass-panel ${styles.card}`}>
             <h2 className={styles.cardTitle}>Add Student</h2>
-            <form className={styles.form} onSubmit={handleCreateStudent}>
-              <input
-                type="text"
-                placeholder="First Name"
-                className={styles.input}
-                value={newFullName}
-                onChange={(event) => setNewFullName(event.target.value)}
-                required
-              />
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="DD/MM/YYYY"
-                  className={styles.input}
-                  value={newDob}
-                  onChange={(event) => handleDobChange(event, setNewDob)}
-                  required
-                  style={{ paddingRight: '40px' }}
-                />
-                <input
-                  type="date"
-                  ref={newDateInputRef}
-                  onChange={(e) => handleNativeDateChange(e, setNewDob)}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    width: '24px',
-                    height: '24px',
-                    opacity: 0,
-                    cursor: 'pointer',
-                    zIndex: 2
-                  }}
-                />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    width: '20px',
-                    height: '20px',
-                    color: 'var(--text-secondary)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
-              {classes.length > 0 && (
-                <label className={styles.timeLabel}>
-                  <span>Class</span>
-                  <select
-                    className={styles.input}
-                    value={newStudentClassMode === "new" ? "__new__" : newStudentClassId}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      if (value === "__new__") {
-                        setNewStudentClassMode("new");
-                        setNewStudentClassId("");
-                        return;
-                      }
-
-                      setNewStudentClassMode("existing");
-                      setNewStudentClassId(value);
-                    }}
-                    required
-                  >
-                    <option value="">Choose class</option>
-                    {classes.map((studentClass) => (
-                      <option key={studentClass.id} value={studentClass.id}>
-                        {studentClass.name}
-                      </option>
-                    ))}
-                    <option value="__new__">Create new class</option>
-                  </select>
-                </label>
-              )}
-              {(classes.length === 0 || newStudentClassMode === "new") && (
-                <input
-                  type="text"
-                  placeholder={classes.length === 0 ? "First class name" : "New class name"}
-                  className={styles.input}
-                  value={newStudentNewClassName}
-                  onChange={(event) => setNewStudentNewClassName(event.target.value)}
-                  required
-                />
-              )}
-              <button type="submit" className={styles.submitBtn}>
-                Create Student
-              </button>
-            </form>
+            <p className={styles.helperText}>Add a student when you need the form. Keep the dashboard easy to scan.</p>
+            <button
+              type="button"
+              className={styles.primaryActionBtn}
+              onClick={() => {
+                setError("");
+                setSuccess("");
+                setShowAddStudentModal(true);
+              }}
+            >
+              Add Student
+            </button>
           </div>
 
           <div className={`glass-panel ${styles.card}`}>
@@ -752,68 +899,17 @@ export function AdminDashboardClient({
           <div className={`glass-panel ${styles.card}`}>
             <h2 className={styles.cardTitle}>Add Admin</h2>
             <p className={styles.helperText}>Admins can be teachers too.</p>
-            <form className={styles.form} onSubmit={handleCreateAdmin}>
-              <input
-                type="text"
-                placeholder="Admin Name"
-                className={styles.input}
-                value={newAdminFullName}
-                onChange={(event) => setNewAdminFullName(event.target.value)}
-                required
-              />
-              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="DD/MM/YYYY"
-                  className={styles.input}
-                  value={newAdminDob}
-                  onChange={(event) => handleDobChange(event, setNewAdminDob)}
-                  required
-                  style={{ paddingRight: '40px' }}
-                />
-                <input
-                  type="date"
-                  ref={newAdminDateInputRef}
-                  onChange={(event) => handleNativeDateChange(event, setNewAdminDob)}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    width: '24px',
-                    height: '24px',
-                    opacity: 0,
-                    cursor: 'pointer',
-                    zIndex: 2
-                  }}
-                />
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    width: '20px',
-                    height: '20px',
-                    color: 'var(--text-secondary)',
-                    pointerEvents: 'none',
-                    zIndex: 1
-                  }}
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </div>
-              <button type="submit" className={styles.submitBtn}>
-                Create Admin
-              </button>
-            </form>
+            <button
+              type="button"
+              className={styles.primaryActionBtn}
+              onClick={() => {
+                setError("");
+                setSuccess("");
+                setShowAddAdminModal(true);
+              }}
+            >
+              Add Admin
+            </button>
             <div className={styles.adminList}>
               <p className={styles.listTitle}>Current admins</p>
               {admins.map((admin) => (
