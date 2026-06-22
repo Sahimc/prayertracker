@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import styles from "@/app/admin/page.module.css";
 import { ALADHAN_LATITUDE_ADJUSTMENTS, ALADHAN_METHODS, ALADHAN_SCHOOLS } from "@/lib/aladhan";
-import { BIRTH_MONTHS, formatBirthMonthYear, getBirthYearOptions } from "@/lib/birthdays";
+import { BIRTH_MONTHS, cleanBirthYearInput, formatBirthMonthYear } from "@/lib/birthdays";
 import { formatPrayerTime, formatUKDate, getFormatDate } from "@/lib/dates";
 import {
   calculatePointsFromLogs,
@@ -131,7 +131,6 @@ export function AdminDashboardClient({
   const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const birthYears = useMemo(() => getBirthYearOptions(), []);
 
   const todayDateStr = getFormatDate(new Date());
 
@@ -686,19 +685,18 @@ export function AdminDashboardClient({
                       </option>
                     ))}
                   </select>
-                  <select
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={4}
                     className={styles.input}
+                    placeholder="Year"
                     value={newBirthYear}
-                    onChange={(event) => setNewBirthYear(event.target.value)}
+                    onChange={(event) => setNewBirthYear(cleanBirthYearInput(event.target.value))}
+                    autoComplete="bday-year"
                     required
-                  >
-                    <option value="">Year</option>
-                    {birthYears.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
               </label>
               {classes.length > 0 && (
@@ -802,19 +800,18 @@ export function AdminDashboardClient({
                       </option>
                     ))}
                   </select>
-                  <select
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={4}
                     className={styles.input}
+                    placeholder="Year"
                     value={newAdminBirthYear}
-                    onChange={(event) => setNewAdminBirthYear(event.target.value)}
+                    onChange={(event) => setNewAdminBirthYear(cleanBirthYearInput(event.target.value))}
+                    autoComplete="bday-year"
                     required
-                  >
-                    <option value="">Year</option>
-                    {birthYears.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
               </label>
               <button type="submit" className={styles.submitBtn}>
@@ -1169,19 +1166,18 @@ export function AdminDashboardClient({
                           </option>
                         ))}
                       </select>
-                      <select
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={4}
                         className={styles.input}
+                        placeholder="Year"
                         value={editBirthYear}
-                        onChange={(event) => setEditBirthYear(event.target.value)}
+                        onChange={(event) => setEditBirthYear(cleanBirthYearInput(event.target.value))}
+                        autoComplete="bday-year"
                         required
-                      >
-                        <option value="">Year</option>
-                        {birthYears.map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
+                      />
                     </div>
                     <select
                       className={styles.input}

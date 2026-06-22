@@ -69,7 +69,7 @@ Masjid Umar (Luton), slug `masjid-umar`:
 - Student: `Safiya`, Birthday `November 2019`, class `Weekend Class`
 - Student: `Ibrahim`, Birthday `March 2018`, class `Weekday Class`
 
-All birthday entry in the UI uses Month and Year dropdowns. The database stores birthday values as `birthMonth` and `birthYear`.
+All birthday entry in the UI uses a Month dropdown and typed Year field. The database stores birthday values as `birthMonth` and `birthYear`.
 
 ## Classes
 

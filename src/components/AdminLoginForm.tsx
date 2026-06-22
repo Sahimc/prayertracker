@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import styles from "@/app/page.module.css";
-import { BIRTH_MONTHS, getBirthYearOptions } from "@/lib/birthdays";
+import { BIRTH_MONTHS, cleanBirthYearInput } from "@/lib/birthdays";
 import type { OrganizationSummary } from "@/lib/types";
 
 type LoginResponse = {
@@ -23,7 +23,6 @@ export function AdminLoginForm({ organization }: AdminLoginFormProps) {
   const [birthYear, setBirthYear] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const birthYears = useMemo(() => getBirthYearOptions(), []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,20 +98,19 @@ export function AdminLoginForm({ organization }: AdminLoginFormProps) {
                   </option>
                 ))}
               </select>
-              <select
+              <input
                 id="admin-birth-year"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={4}
                 className={styles.input}
+                placeholder="Year"
                 value={birthYear}
-                onChange={(event) => setBirthYear(event.target.value)}
+                onChange={(event) => setBirthYear(cleanBirthYearInput(event.target.value))}
+                autoComplete="bday-year"
                 required
-              >
-                <option value="">Year</option>
-                {birthYears.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
 

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import styles from "@/app/page.module.css";
-import { BIRTH_MONTHS, getBirthYearOptions } from "@/lib/birthdays";
+import { BIRTH_MONTHS, cleanBirthYearInput } from "@/lib/birthdays";
 
 type CreateMosqueResponse = {
   organization?: {
@@ -33,7 +33,6 @@ export function CreateMosqueForm() {
   const [shareStatus, setShareStatus] = useState("");
   const [createdMosque, setCreatedMosque] = useState<CreatedMosque | null>(null);
   const [loading, setLoading] = useState(false);
-  const birthYears = useMemo(() => getBirthYearOptions(), []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -230,20 +229,19 @@ export function CreateMosqueForm() {
                   </option>
                 ))}
               </select>
-              <select
+              <input
                 id="admin-birth-year"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={4}
                 className={styles.input}
+                placeholder="Year"
                 value={birthYear}
-                onChange={(event) => setBirthYear(event.target.value)}
+                onChange={(event) => setBirthYear(cleanBirthYearInput(event.target.value))}
+                autoComplete="bday-year"
                 required
-              >
-                <option value="">Year</option>
-                {birthYears.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
 

@@ -15,13 +15,8 @@ export const BIRTH_MONTHS = [
   { value: 12, label: "December" },
 ];
 
-export function getBirthYearOptions(): number[] {
-  const currentYear = new Date().getFullYear();
-  const years: number[] = [];
-  for (let year = currentYear; year >= MIN_BIRTH_YEAR; year -= 1) {
-    years.push(year);
-  }
-  return years;
+export function cleanBirthYearInput(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 4);
 }
 
 export function parseBirthMonthYear(monthValue: unknown, yearValue: unknown): { birthMonth: number; birthYear: number } | null {
