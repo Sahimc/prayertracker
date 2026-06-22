@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState } from "react";
 import styles from "@/app/admin/page.module.css";
 import { ALADHAN_LATITUDE_ADJUSTMENTS, ALADHAN_METHODS, ALADHAN_SCHOOLS } from "@/lib/aladhan";
-import {
-  formatIsoToUkDate,
-  formatPrayerTime,
-  formatUKDate,
-  getFormatDate,
-} from "@/lib/dates";
+import { BIRTH_MONTHS, formatBirthMonthYear, getBirthYearOptions } from "@/lib/birthdays";
+import { formatPrayerTime, formatUKDate, getFormatDate } from "@/lib/dates";
 import {
   calculatePointsFromLogs,
   countCompletedPrayers,
@@ -35,6 +31,7 @@ type AdminDashboardClientProps = {
   initialPrayerSettings: PrayerSettingsSummary;
   initialPrayerTime: PrayerTimeSummary | null;
   mosqueSlug: string;
+  currentAdminId: string;
 };
 
 type StudentResponse = {
@@ -94,27 +91,31 @@ export function AdminDashboardClient({
   initialPrayerSettings,
   initialPrayerTime,
   mosqueSlug,
+  currentAdminId,
 }: AdminDashboardClientProps) {
   const [students, setStudents] = useState(initialStudents);
   const [admins, setAdmins] = useState(initialAdmins);
   const [classes, setClasses] = useState(initialClasses);
   const [newClassName, setNewClassName] = useState("");
   const [newFullName, setNewFullName] = useState("");
-  const [newDob, setNewDob] = useState("");
+  const [newBirthMonth, setNewBirthMonth] = useState("");
+  const [newBirthYear, setNewBirthYear] = useState("");
   const [newStudentClassMode, setNewStudentClassMode] = useState<StudentClassMode>(
     initialClasses.length > 0 ? "existing" : "new",
   );
   const [newStudentClassId, setNewStudentClassId] = useState(initialClasses[0]?.id ?? "");
   const [newStudentNewClassName, setNewStudentNewClassName] = useState("");
   const [newAdminFullName, setNewAdminFullName] = useState("");
-  const [newAdminDob, setNewAdminDob] = useState("");
+  const [newAdminBirthMonth, setNewAdminBirthMonth] = useState("");
+  const [newAdminBirthYear, setNewAdminBirthYear] = useState("");
   const [query, setQuery] = useState("");
   const [classFilterId, setClassFilterId] = useState("all");
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [sortMode, setSortMode] = useState<SortMode>("name");
   const [editingStudentId, setEditingStudentId] = useState("");
   const [editFullName, setEditFullName] = useState("");
-  const [editDob, setEditDob] = useState("");
+  const [editBirthMonth, setEditBirthMonth] = useState("");
+  const [editBirthYear, setEditBirthYear] = useState("");
   const [editClassId, setEditClassId] = useState("");
   const [prayerTime, setPrayerTime] = useState(initialPrayerTime);
   const [prayerSettings, setPrayerSettings] = useState<PrayerSettingsSummary>(initialPrayerSettings);
@@ -123,34 +124,14 @@ export function AdminDashboardClient({
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [studentPendingDelete, setStudentPendingDelete] = useState<{ id: string; name: string } | null>(null);
+  const [adminPendingDelete, setAdminPendingDelete] = useState<{ id: string; name: string } | null>(null);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+  const [adminDeleteConfirmationText, setAdminDeleteConfirmationText] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const newDateInputRef = useRef<HTMLInputElement>(null);
-  const newAdminDateInputRef = useRef<HTMLInputElement>(null);
-  const editDateInputRef = useRef<HTMLInputElement>(null);
-
-  const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
-    let val = e.target.value.replace(/\D/g, "");
-    if (val.length > 8) val = val.slice(0, 8);
-    let formatted = val;
-    if (val.length >= 5) {
-      formatted = `${val.slice(0, 2)}/${val.slice(2, 4)}/${val.slice(4)}`;
-    } else if (val.length >= 3) {
-      formatted = `${val.slice(0, 2)}/${val.slice(2)}`;
-    }
-    setter(formatted);
-  };
-
-  const handleNativeDateChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
-    const val = e.target.value;
-    if (!val) return;
-    const parts = val.split("-");
-    if (parts.length === 3) {
-      setter(`${parts[2]}/${parts[1]}/${parts[0]}`);
-    }
-  };
+  const birthYears = useMemo(() => getBirthYearOptions(), []);
 
   const todayDateStr = getFormatDate(new Date());
 
@@ -252,8 +233,18 @@ export function AdminDashboardClient({
 
     const shouldCreateClass = classes.length === 0 || newStudentClassMode === "new";
     const studentPayload = shouldCreateClass
-      ? { fullName: newFullName, dob: newDob, newClassName: newStudentNewClassName }
-      : { fullName: newFullName, dob: newDob, classId: newStudentClassId };
+      ? {
+          fullName: newFullName,
+          birthMonth: newBirthMonth,
+          birthYear: newBirthYear,
+          newClassName: newStudentNewClassName,
+        }
+      : {
+          fullName: newFullName,
+          birthMonth: newBirthMonth,
+          birthYear: newBirthYear,
+          classId: newStudentClassId,
+        };
 
     try {
       const response = await fetch("/api/students", {
@@ -277,7 +268,8 @@ export function AdminDashboardClient({
         setNewStudentClassId(data.student.classId);
       }
       setNewFullName("");
-      setNewDob("");
+      setNewBirthMonth("");
+      setNewBirthYear("");
       setNewStudentNewClassName("");
       setShowAddStudentModal(false);
       setSuccess("Student added.");
@@ -295,7 +287,11 @@ export function AdminDashboardClient({
       const response = await fetch("/api/admins", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: newAdminFullName, dob: newAdminDob }),
+        body: JSON.stringify({
+          fullName: newAdminFullName,
+          birthMonth: newAdminBirthMonth,
+          birthYear: newAdminBirthYear,
+        }),
       });
       const data = (await response.json()) as AdminResponse;
 
@@ -305,7 +301,8 @@ export function AdminDashboardClient({
 
       setAdmins((currentAdmins) => [...currentAdmins, data.admin as AdminSummary]);
       setNewAdminFullName("");
-      setNewAdminDob("");
+      setNewAdminBirthMonth("");
+      setNewAdminBirthYear("");
       setShowAddAdminModal(false);
       setSuccess("Admin added.");
     } catch (createError) {
@@ -316,7 +313,8 @@ export function AdminDashboardClient({
   function startEdit(student: StudentSummary) {
     setEditingStudentId(student.id);
     setEditFullName(student.fullName);
-    setEditDob(formatIsoToUkDate(student.dateOfBirth));
+    setEditBirthMonth(String(student.birthMonth));
+    setEditBirthYear(String(student.birthYear));
     setEditClassId(student.classId);
     setError("");
     setSuccess("");
@@ -332,7 +330,12 @@ export function AdminDashboardClient({
       const response = await fetch(`/api/students/${editingStudentId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: editFullName, dob: editDob, classId: editClassId }),
+        body: JSON.stringify({
+          fullName: editFullName,
+          birthMonth: editBirthMonth,
+          birthYear: editBirthYear,
+          classId: editClassId,
+        }),
       });
       const data = (await response.json()) as StudentResponse;
 
@@ -384,6 +387,43 @@ export function AdminDashboardClient({
       setError(deleteError instanceof Error ? deleteError.message : "Failed to delete student");
     } finally {
       setDeleteLoading(false);
+    }
+  }
+
+  function openDeleteAdminModal(id: string, name: string) {
+    setAdminPendingDelete({ id, name });
+    setAdminDeleteConfirmationText("");
+    setError("");
+    setSuccess("");
+  }
+
+  function closeDeleteAdminModal() {
+    if (adminDeleteLoading) return;
+    setAdminPendingDelete(null);
+    setAdminDeleteConfirmationText("");
+  }
+
+  async function confirmDeleteAdmin() {
+    if (!adminPendingDelete || adminDeleteConfirmationText.trim().toUpperCase() !== "DELETE") return;
+    setError("");
+    setSuccess("");
+    setAdminDeleteLoading(true);
+
+    try {
+      const response = await fetch(`/api/admins/${adminPendingDelete.id}`, { method: "DELETE" });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete admin");
+      }
+
+      setAdmins((currentAdmins) => currentAdmins.filter((admin) => admin.id !== adminPendingDelete.id));
+      setAdminPendingDelete(null);
+      setAdminDeleteConfirmationText("");
+      setSuccess("Admin deleted.");
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Failed to delete admin");
+    } finally {
+      setAdminDeleteLoading(false);
     }
   }
 
@@ -553,6 +593,48 @@ export function AdminDashboardClient({
         </div>
       )}
 
+      {adminPendingDelete && (
+        <div className={styles.modalOverlay} role="presentation">
+          <div
+            className={styles.reminderModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-admin-title"
+            aria-describedby="delete-admin-description"
+          >
+            <p className={styles.deleteEyebrow}>Permanent delete</p>
+            <h2 id="delete-admin-title">Delete {adminPendingDelete.name}?</h2>
+            <p id="delete-admin-description">
+              This will remove this admin&apos;s access to this mosque. This cannot be undone.
+            </p>
+            <label className={styles.confirmLabel}>
+              <span>Type DELETE to confirm</span>
+              <input
+                type="text"
+                className={styles.input}
+                value={adminDeleteConfirmationText}
+                onChange={(event) => setAdminDeleteConfirmationText(event.target.value)}
+                autoFocus
+                autoComplete="off"
+              />
+            </label>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.btnSecondary} onClick={closeDeleteAdminModal}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.deleteConfirmBtn}
+                onClick={confirmDeleteAdmin}
+                disabled={adminDeleteConfirmationText.trim().toUpperCase() !== "DELETE" || adminDeleteLoading}
+              >
+                {adminDeleteLoading ? "Deleting..." : "Delete Admin"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showAddStudentModal && (
         <div className={styles.fullScreenModalOverlay} role="presentation">
           <section
@@ -590,54 +672,33 @@ export function AdminDashboardClient({
               </label>
               <label className={styles.fieldLabel}>
                 <span>Birthday</span>
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="DD/MM/YYYY"
+                <div className={styles.birthdayGrid}>
+                  <select
                     className={styles.input}
-                    value={newDob}
-                    onChange={(event) => handleDobChange(event, setNewDob)}
+                    value={newBirthMonth}
+                    onChange={(event) => setNewBirthMonth(event.target.value)}
                     required
-                    style={{ paddingRight: '40px' }}
-                  />
-                  <input
-                    type="date"
-                    ref={newDateInputRef}
-                    onChange={(e) => handleNativeDateChange(e, setNewDob)}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      width: '24px',
-                      height: '24px',
-                      opacity: 0,
-                      cursor: 'pointer',
-                      zIndex: 2
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      width: '20px',
-                      height: '20px',
-                      color: 'var(--text-secondary)',
-                      pointerEvents: 'none',
-                      zIndex: 1
-                    }}
                   >
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
+                    <option value="">Month</option>
+                    {BIRTH_MONTHS.map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className={styles.input}
+                    value={newBirthYear}
+                    onChange={(event) => setNewBirthYear(event.target.value)}
+                    required
+                  >
+                    <option value="">Year</option>
+                    {birthYears.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </label>
               {classes.length > 0 && (
@@ -727,54 +788,33 @@ export function AdminDashboardClient({
               </label>
               <label className={styles.fieldLabel}>
                 <span>Birthday</span>
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="DD/MM/YYYY"
+                <div className={styles.birthdayGrid}>
+                  <select
                     className={styles.input}
-                    value={newAdminDob}
-                    onChange={(event) => handleDobChange(event, setNewAdminDob)}
+                    value={newAdminBirthMonth}
+                    onChange={(event) => setNewAdminBirthMonth(event.target.value)}
                     required
-                    style={{ paddingRight: '40px' }}
-                  />
-                  <input
-                    type="date"
-                    ref={newAdminDateInputRef}
-                    onChange={(event) => handleNativeDateChange(event, setNewAdminDob)}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      width: '24px',
-                      height: '24px',
-                      opacity: 0,
-                      cursor: 'pointer',
-                      zIndex: 2
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      position: 'absolute',
-                      right: '12px',
-                      width: '20px',
-                      height: '20px',
-                      color: 'var(--text-secondary)',
-                      pointerEvents: 'none',
-                      zIndex: 1
-                    }}
                   >
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
+                    <option value="">Month</option>
+                    {BIRTH_MONTHS.map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className={styles.input}
+                    value={newAdminBirthYear}
+                    onChange={(event) => setNewAdminBirthYear(event.target.value)}
+                    required
+                  >
+                    <option value="">Year</option>
+                    {birthYears.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </label>
               <button type="submit" className={styles.submitBtn}>
@@ -913,9 +953,20 @@ export function AdminDashboardClient({
             <div className={styles.adminList}>
               <p className={styles.listTitle}>Current admins</p>
               {admins.map((admin) => (
-                <span key={admin.id} className={styles.adminChip}>
+                <div key={admin.id} className={styles.adminListItem}>
                   <strong>{admin.fullName}</strong>
-                </span>
+                  {admin.id === currentAdminId ? (
+                    <span className={styles.currentAdminPill}>You</span>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.deleteMiniBtn}
+                      onClick={() => openDeleteAdminModal(admin.id, admin.fullName)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               ))}
               {admins.length === 0 && <p className={styles.classEmpty}>No admins have been added yet.</p>}
             </div>
@@ -1072,7 +1123,8 @@ export function AdminDashboardClient({
                   <div>
                     <h3 className={styles.studentName}>{student.fullName}</h3>
                     <p className={styles.studentMeta}>
-                      Class {student.class.name} {"\u00b7"} Birthday {formatIsoToUkDate(student.dateOfBirth)}{" "}
+                      Class {student.class.name} {"\u00b7"} Birthday{" "}
+                      {formatBirthMonthYear(student.birthMonth, student.birthYear)}{" "}
                       {"\u00b7"} {student.todayCompleted}/5 today {"\u00b7"}{" "}
                       {student.totalPoints} pts
                     </p>
@@ -1103,53 +1155,33 @@ export function AdminDashboardClient({
                       onChange={(event) => setEditFullName(event.target.value)}
                       required
                     />
-                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                      <input
-                        type="text"
-                        inputMode="numeric"
+                    <div className={styles.birthdayGrid}>
+                      <select
                         className={styles.input}
-                        value={editDob}
-                        onChange={(event) => handleDobChange(event, setEditDob)}
+                        value={editBirthMonth}
+                        onChange={(event) => setEditBirthMonth(event.target.value)}
                         required
-                        style={{ paddingRight: '40px' }}
-                      />
-                      <input
-                        type="date"
-                        ref={editDateInputRef}
-                        onChange={(e) => handleNativeDateChange(e, setEditDob)}
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          width: '24px',
-                          height: '24px',
-                          opacity: 0,
-                          cursor: 'pointer',
-                          zIndex: 2
-                        }}
-                      />
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          position: 'absolute',
-                          right: '12px',
-                          width: '20px',
-                          height: '20px',
-                          color: 'var(--text-secondary)',
-                          pointerEvents: 'none',
-                          zIndex: 1
-                        }}
                       >
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
+                        <option value="">Month</option>
+                        {BIRTH_MONTHS.map((month) => (
+                          <option key={month.value} value={month.value}>
+                            {month.label}
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        className={styles.input}
+                        value={editBirthYear}
+                        onChange={(event) => setEditBirthYear(event.target.value)}
+                        required
+                      >
+                        <option value="">Year</option>
+                        {birthYears.map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <select
                       className={styles.input}

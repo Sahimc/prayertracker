@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession } from "@/lib/api-auth";
-import { getTodayIso, isFutureDate, isValidIsoDate } from "@/lib/dates";
+import { getIsoFromDateTime, getIsoDaysAgo, getTodayIso, isFutureDate, isValidIsoDate } from "@/lib/dates";
 import { isPrayerName } from "@/lib/prayers";
 
 export const runtime = "nodejs";
@@ -51,11 +51,21 @@ export async function POST(request: Request) {
       select: {
         id: true,
         organizationId: true,
+        createdAt: true,
       },
     });
 
     if (!student) {
       return NextResponse.json({ error: "Student not found" }, { status: 404 });
+    }
+
+    const createdDate = getIsoFromDateTime(student.createdAt);
+    if (date < createdDate) {
+      return NextResponse.json({ error: "Cannot log prayers before the student was created" }, { status: 400 });
+    }
+
+    if (auth.session.role === "student" && date < getIsoDaysAgo(27, getTodayIso())) {
+      return NextResponse.json({ error: "Students can only update prayers from the last 4 weeks" }, { status: 403 });
     }
 
     const prayerLog = await prisma.prayerLog.upsert({

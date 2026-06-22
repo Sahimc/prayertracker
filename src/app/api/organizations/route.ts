@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
-import { parseUkDobToIso } from "@/lib/dates";
+import { parseBirthMonthYear } from "@/lib/birthdays";
 import { generateUniqueMosqueSlug } from "@/lib/slugs";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const mosqueName = cleanDisplayName(String(body.mosqueName ?? ""));
     const town = cleanDisplayName(String(body.town ?? ""));
     const adminName = cleanDisplayName(String(body.adminName ?? ""));
-    const adminDob = String(body.adminDob ?? "");
+    const birthday = parseBirthMonthYear(body.birthMonth, body.birthYear);
 
     if (!mosqueName) {
       return NextResponse.json({ error: "Mosque name is required" }, { status: 400 });
@@ -46,9 +46,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "First admin name is required" }, { status: 400 });
     }
 
-    const dateOfBirth = parseUkDobToIso(adminDob);
-    if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
+    if (!birthday) {
+      return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
     }
 
     const slug = await generateUniqueMosqueSlug(mosqueName, town, async (candidate) => {
@@ -73,7 +72,8 @@ export async function POST(request: Request) {
           organizationId: organization.id,
           fullName: adminName,
           normalizedName: normalizeName(adminName),
-          dateOfBirth,
+          birthMonth: birthday.birthMonth,
+          birthYear: birthday.birthYear,
         },
       });
 

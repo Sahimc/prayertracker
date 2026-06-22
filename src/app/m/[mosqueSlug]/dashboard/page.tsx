@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StudentDashboardClient } from "@/components/StudentDashboardClient";
 import { getTodayIso } from "@/lib/dates";
+import { ensurePrayerLogsThroughToday } from "@/lib/prayer-history";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import styles from "@/app/page.module.css";
@@ -48,7 +49,9 @@ export default async function StudentDashboardPage({ params }: StudentDashboardP
       organizationId: true,
       classId: true,
       fullName: true,
-      dateOfBirth: true,
+      birthMonth: true,
+      birthYear: true,
+      createdAt: true,
       class: {
         select: {
           id: true,
@@ -77,6 +80,45 @@ export default async function StudentDashboardPage({ params }: StudentDashboardP
     redirect(`/m/${mosqueSlug}`);
   }
 
+  await ensurePrayerLogsThroughToday(student);
+
+  const studentWithHistory = await prisma.student.findFirst({
+    where: {
+      id: session.studentId,
+      organizationId: organization.id,
+    },
+    select: {
+      id: true,
+      organizationId: true,
+      classId: true,
+      fullName: true,
+      birthMonth: true,
+      birthYear: true,
+      createdAt: true,
+      class: {
+        select: {
+          id: true,
+          organizationId: true,
+          name: true,
+        },
+      },
+      prayers: {
+        select: {
+          id: true,
+          organizationId: true,
+          studentId: true,
+          date: true,
+          fajr: true,
+          dhuhr: true,
+          asr: true,
+          maghrib: true,
+          isha: true,
+        },
+        orderBy: { date: "desc" },
+      },
+    },
+  });
+
   const prayerTime = await prisma.prayerTime.findUnique({
     where: {
       organizationId_date: {
@@ -99,7 +141,7 @@ export default async function StudentDashboardPage({ params }: StudentDashboardP
   return (
     <StudentDashboardClient
       organization={organization}
-      initialStudent={student}
+      initialStudent={studentWithHistory ?? student}
       initialPrayerTime={prayerTime}
       mosqueSlug={mosqueSlug}
     />

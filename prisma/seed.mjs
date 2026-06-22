@@ -44,7 +44,8 @@ async function createOrganization({ name, town, slug, admin, classes, students, 
       organizationId: organization.id,
       fullName: admin.fullName,
       normalizedName: normalizeName(admin.fullName),
-      dateOfBirth: admin.dateOfBirth,
+      birthMonth: admin.birthMonth,
+      birthYear: admin.birthYear,
     },
   });
 
@@ -73,7 +74,8 @@ async function createOrganization({ name, town, slug, admin, classes, students, 
         classId: studentClass.id,
         fullName: student.fullName,
         normalizedName: normalizeName(student.fullName),
-        dateOfBirth: student.dateOfBirth,
+        birthMonth: student.birthMonth,
+        birthYear: student.birthYear,
       },
     });
     createdStudents.push(created);
@@ -110,12 +112,12 @@ async function main() {
     name: "Green Lane Masjid",
     town: "East Ham",
     slug: "green-lane-masjid",
-    admin: { fullName: "Aisha", dateOfBirth: "1990-02-01" },
+    admin: { fullName: "Aisha", birthMonth: 2, birthYear: 1990 },
     classes: ["Beginners", "Level 1"],
     students: [
-      { fullName: "Abdullah", dateOfBirth: "2020-02-01", className: "Beginners" },
-      { fullName: "Maryam", dateOfBirth: "2019-05-15", className: "Beginners" },
-      { fullName: "Yusuf", dateOfBirth: "2018-08-22", className: "Level 1" },
+      { fullName: "Abdullah", birthMonth: 2, birthYear: 2020, className: "Beginners" },
+      { fullName: "Maryam", birthMonth: 5, birthYear: 2019, className: "Beginners" },
+      { fullName: "Yusuf", birthMonth: 8, birthYear: 2018, className: "Level 1" },
     ],
     prayerTimes: {
       date: todayIso,
@@ -131,12 +133,12 @@ async function main() {
     name: "Masjid Umar",
     town: "Luton",
     slug: "masjid-umar",
-    admin: { fullName: "Omar", dateOfBirth: "1988-06-05" },
+    admin: { fullName: "Omar", birthMonth: 6, birthYear: 1988 },
     classes: ["Weekday Class", "Weekend Class"],
     students: [
-      { fullName: "Abdullah", dateOfBirth: "2020-02-01", className: "Weekday Class" },
-      { fullName: "Safiya", dateOfBirth: "2019-11-09", className: "Weekend Class" },
-      { fullName: "Ibrahim", dateOfBirth: "2018-03-17", className: "Weekday Class" },
+      { fullName: "Abdullah", birthMonth: 2, birthYear: 2020, className: "Weekday Class" },
+      { fullName: "Safiya", birthMonth: 11, birthYear: 2019, className: "Weekend Class" },
+      { fullName: "Ibrahim", birthMonth: 3, birthYear: 2018, className: "Weekday Class" },
     ],
     prayerTimes: {
       date: todayIso,
@@ -161,8 +163,8 @@ async function main() {
   });
 
   console.log("Seeded organizations:");
-  console.log("- Green Lane Masjid (East Ham), admin Aisha, Birthday 01/02/1990");
-  console.log("- Masjid Umar (Luton), admin Omar, Birthday 05/06/1988");
+  console.log("- Green Lane Masjid (East Ham), admin Aisha, Birthday February 1990");
+  console.log("- Masjid Umar (Luton), admin Omar, Birthday June 1988");
 }
 
 main()

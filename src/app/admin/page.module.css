@@ -324,6 +324,12 @@
   color: #dbeafe;
 }
 
+.birthdayGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 0.75rem;
+}
+
 .primaryActionBtn {
   width: 100%;
   min-height: 54px;
@@ -389,25 +395,48 @@
   white-space: nowrap;
 }
 
-.adminChip {
+.adminListItem {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   border: 1px solid rgba(96, 165, 250, 0.28);
   border-radius: var(--border-radius-sm);
   background: rgba(59, 130, 246, 0.12);
   padding: 0.7rem 0.75rem;
 }
 
-.adminChip strong {
+.adminListItem strong {
+  min-width: 0;
   color: var(--text-primary);
   font-size: 0.9rem;
   overflow-wrap: anywhere;
 }
 
-.adminChip small {
-  color: #bfdbfe;
-  font-size: 0.72rem;
+.currentAdminPill {
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #86efac;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.deleteMiniBtn {
+  border: 1px solid rgba(248, 113, 113, 0.42);
+  border-radius: 999px;
+  background: rgba(127, 29, 29, 0.28);
+  color: #fca5a5;
+  padding: 0.3rem 0.62rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.deleteMiniBtn:hover {
+  background: rgba(185, 28, 28, 0.38);
+  color: white;
 }
 
 .classEmpty {

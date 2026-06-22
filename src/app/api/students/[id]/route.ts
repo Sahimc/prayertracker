@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession } from "@/lib/api-auth";
+import { parseBirthMonthYear } from "@/lib/birthdays";
+import { isValidIsoDate } from "@/lib/dates";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
-import { isValidIsoDate, parseUkDobToIso } from "@/lib/dates";
 
 export const runtime = "nodejs";
 
 const DUPLICATE_STUDENT_MESSAGE =
-  "A student with this name and birthday already exists. Please add a surname or extra name.";
+  "A student with this name and birthday already exists in this class. Add the student's full name, or delete the old student if they no longer need access.";
 const CLASS_REQUIRED_MESSAGE = "Choose a class for this student.";
 
 export async function GET(
@@ -81,7 +82,7 @@ export async function PATCH(
     const { id } = await context.params;
     const body = await request.json();
     const fullName = cleanDisplayName(String(body.fullName ?? ""));
-    const dob = String(body.dob ?? "");
+    const birthday = parseBirthMonthYear(body.birthMonth, body.birthYear);
     const classId = String(body.classId ?? "");
 
     if (!fullName) {
@@ -92,9 +93,8 @@ export async function PATCH(
       return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
     }
 
-    const dateOfBirth = parseUkDobToIso(dob);
-    if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
+    if (!birthday) {
+      return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
     }
 
     const existingStudent = await prisma.student.findFirst({
@@ -121,10 +121,12 @@ export async function PATCH(
     const normalizedName = normalizeName(fullName);
     const duplicate = await prisma.student.findUnique({
       where: {
-        organizationId_normalizedName_dateOfBirth: {
+        organizationId_classId_normalizedName_birthMonth_birthYear: {
           organizationId: auth.session.organizationId,
+          classId,
           normalizedName,
-          dateOfBirth,
+          birthMonth: birthday.birthMonth,
+          birthYear: birthday.birthYear,
         },
       },
       select: { id: true },
@@ -140,7 +142,8 @@ export async function PATCH(
         fullName,
         classId,
         normalizedName,
-        dateOfBirth,
+        birthMonth: birthday.birthMonth,
+        birthYear: birthday.birthYear,
       },
       include: {
         class: {
@@ -166,7 +169,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
   const auth = await requireApiSession({ role: "admin" });

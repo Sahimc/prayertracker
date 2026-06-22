@@ -1,5 +1,4 @@
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const UK_DATE_PATTERN = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export function getFormatDate(date: Date): string {
@@ -11,6 +10,34 @@ export function getFormatDate(date: Date): string {
 
 export function getTodayIso(): string {
   return getFormatDate(new Date());
+}
+
+export function addDays(dateString: string, days: number): string {
+  const parts = parseIsoDateParts(dateString);
+  if (!parts) return dateString;
+  const date = new Date(parts.year, parts.month - 1, parts.day);
+  date.setDate(date.getDate() + days);
+  return getFormatDate(date);
+}
+
+export function getIsoDaysAgo(days: number, todayString = getTodayIso()): string {
+  return addDays(todayString, -days);
+}
+
+export function getIsoFromDateTime(value: Date | string): string {
+  return getFormatDate(value instanceof Date ? value : new Date(value));
+}
+
+export function getDateRange(startDate: string, endDate: string): string[] {
+  if (!isValidIsoDate(startDate) || !isValidIsoDate(endDate) || startDate > endDate) return [];
+
+  const dates: string[] = [];
+  let current = startDate;
+  while (current <= endDate) {
+    dates.push(current);
+    current = addDays(current, 1);
+  }
+  return dates;
 }
 
 export function parseIsoDateParts(dateString: string): { year: number; month: number; day: number } | null {
@@ -29,36 +56,6 @@ export function parseIsoDateParts(dateString: string): { year: number; month: nu
 
 export function isValidIsoDate(dateString: string): boolean {
   return parseIsoDateParts(dateString) !== null;
-}
-
-export function parseUkDobToIso(value: string): string | null {
-  const trimmed = value.trim();
-  const match = trimmed.match(UK_DATE_PATTERN);
-  if (!match) return null;
-
-  const [, dayValue, monthValue, yearValue] = match;
-  const day = Number(dayValue);
-  const month = Number(monthValue);
-  const year = Number(yearValue);
-  const date = new Date(year, month - 1, day);
-
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
-    return null;
-  }
-
-  const iso = getFormatDate(date);
-  if (isFutureDate(iso, getTodayIso())) return null;
-  return iso;
-}
-
-export function formatIsoToUkDate(dateString: string): string {
-  const parts = parseIsoDateParts(dateString);
-  if (!parts) return dateString;
-  return `${String(parts.day).padStart(2, "0")}/${String(parts.month).padStart(2, "0")}/${parts.year}`;
 }
 
 export function getCurrentWeekDates(): { start: string; end: string; days: string[] } {

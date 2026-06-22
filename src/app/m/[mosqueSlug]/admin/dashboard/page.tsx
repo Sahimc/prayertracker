@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminDashboardClient } from "@/components/AdminDashboardClient";
 import { getTodayIso } from "@/lib/dates";
+import { ensurePrayerLogsForStudents } from "@/lib/prayer-history";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import styles from "@/app/page.module.css";
@@ -57,7 +58,9 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
         organizationId: true,
         classId: true,
         fullName: true,
-        dateOfBirth: true,
+        birthMonth: true,
+        birthYear: true,
+        createdAt: true,
         class: {
           select: {
             id: true,
@@ -88,7 +91,8 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
         id: true,
         organizationId: true,
         fullName: true,
-        dateOfBirth: true,
+        birthMonth: true,
+        birthYear: true,
       },
       orderBy: { fullName: "asc" },
     }),
@@ -121,6 +125,43 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
     }),
   ]);
 
+  await ensurePrayerLogsForStudents(students);
+
+  const studentsWithHistory = await prisma.student.findMany({
+    where: { organizationId: organization.id },
+    select: {
+      id: true,
+      organizationId: true,
+      classId: true,
+      fullName: true,
+      birthMonth: true,
+      birthYear: true,
+      createdAt: true,
+      class: {
+        select: {
+          id: true,
+          organizationId: true,
+          name: true,
+        },
+      },
+      prayers: {
+        select: {
+          id: true,
+          organizationId: true,
+          studentId: true,
+          date: true,
+          fajr: true,
+          dhuhr: true,
+          asr: true,
+          maghrib: true,
+          isha: true,
+        },
+        orderBy: { date: "desc" },
+      },
+    },
+    orderBy: { fullName: "asc" },
+  });
+
   return (
     <AdminDashboardClient
       organization={organization}
@@ -132,11 +173,12 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
         school: organization.prayerSchool,
         latitudeAdjustmentMethod: organization.prayerLatitudeAdjustmentMethod,
       }}
-      initialStudents={students}
+      initialStudents={studentsWithHistory}
       initialAdmins={admins}
       initialClasses={classes}
       initialPrayerTime={prayerTime}
       mosqueSlug={mosqueSlug}
+      currentAdminId={session.adminId ?? ""}
     />
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StudentHistoryClient } from "@/components/StudentHistoryClient";
+import { ensurePrayerLogsThroughToday } from "@/lib/prayer-history";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import styles from "@/app/page.module.css";
@@ -47,7 +48,9 @@ export default async function StudentHistoryPage({ params }: StudentHistoryPageP
       organizationId: true,
       classId: true,
       fullName: true,
-      dateOfBirth: true,
+      birthMonth: true,
+      birthYear: true,
+      createdAt: true,
       class: {
         select: {
           id: true,
@@ -76,5 +79,44 @@ export default async function StudentHistoryPage({ params }: StudentHistoryPageP
     redirect(`/m/${mosqueSlug}`);
   }
 
-  return <StudentHistoryClient organization={organization} student={student} mosqueSlug={mosqueSlug} />;
+  await ensurePrayerLogsThroughToday(student);
+
+  const studentWithHistory = await prisma.student.findFirst({
+    where: {
+      id: session.studentId,
+      organizationId: organization.id,
+    },
+    select: {
+      id: true,
+      organizationId: true,
+      classId: true,
+      fullName: true,
+      birthMonth: true,
+      birthYear: true,
+      createdAt: true,
+      class: {
+        select: {
+          id: true,
+          organizationId: true,
+          name: true,
+        },
+      },
+      prayers: {
+        select: {
+          id: true,
+          organizationId: true,
+          studentId: true,
+          date: true,
+          fajr: true,
+          dhuhr: true,
+          asr: true,
+          maghrib: true,
+          isha: true,
+        },
+        orderBy: { date: "desc" },
+      },
+    },
+  });
+
+  return <StudentHistoryClient organization={organization} student={studentWithHistory ?? student} mosqueSlug={mosqueSlug} />;
 }

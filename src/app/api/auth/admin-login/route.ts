@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
-import { parseUkDobToIso } from "@/lib/dates";
+import { parseBirthMonthYear } from "@/lib/birthdays";
 
 export const runtime = "nodejs";
 
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const mosqueSlug = String(body.mosqueSlug ?? "");
     const fullName = cleanDisplayName(String(body.fullName ?? ""));
-    const dob = String(body.dob ?? "");
+    const birthday = parseBirthMonthYear(body.birthMonth, body.birthYear);
 
     if (!mosqueSlug) {
       return NextResponse.json({ error: "Mosque slug is required" }, { status: 400 });
@@ -21,9 +21,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Admin Name is required" }, { status: 400 });
     }
 
-    const dateOfBirth = parseUkDobToIso(dob);
-    if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
+    if (!birthday) {
+      return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
     }
 
     const organization = await prisma.organization.findUnique({
@@ -37,10 +36,11 @@ export async function POST(request: Request) {
 
     const admin = await prisma.admin.findUnique({
       where: {
-        organizationId_normalizedName_dateOfBirth: {
+        organizationId_normalizedName_birthMonth_birthYear: {
           organizationId: organization.id,
           normalizedName: normalizeName(fullName),
-          dateOfBirth,
+          birthMonth: birthday.birthMonth,
+          birthYear: birthday.birthYear,
         },
       },
       select: { id: true },

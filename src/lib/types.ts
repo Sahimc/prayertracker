@@ -53,7 +53,9 @@ export type StudentSummary = {
   classId: string;
   class: ClassSummary;
   fullName: string;
-  dateOfBirth: string;
+  birthMonth: number;
+  birthYear: number;
+  createdAt: Date | string;
   prayers: PrayerLogSummary[];
 };
 
@@ -61,7 +63,8 @@ export type AdminSummary = {
   id: string;
   organizationId: string;
   fullName: string;
-  dateOfBirth: string;
+  birthMonth: number;
+  birthYear: number;
 };
 
 export type StudentWithStats = StudentSummary & {

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireApiSession } from "@/lib/api-auth";
-import { parseUkDobToIso } from "@/lib/dates";
+import { parseBirthMonthYear } from "@/lib/birthdays";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 const DUPLICATE_ADMIN_MESSAGE =
-  "An admin with this name and birthday already exists for this mosque.";
+  "An admin with this name and birthday already exists for this mosque. Add the admin's full name, or delete the old admin if they no longer need access.";
 
 export async function GET() {
   const auth = await requireApiSession({ role: "admin" });
@@ -20,7 +20,8 @@ export async function GET() {
         id: true,
         organizationId: true,
         fullName: true,
-        dateOfBirth: true,
+        birthMonth: true,
+        birthYear: true,
       },
       orderBy: { fullName: "asc" },
     });
@@ -39,24 +40,24 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const fullName = cleanDisplayName(String(body.fullName ?? ""));
-    const dob = String(body.dob ?? "");
+    const birthday = parseBirthMonthYear(body.birthMonth, body.birthYear);
 
     if (!fullName) {
       return NextResponse.json({ error: "Admin Name is required" }, { status: 400 });
     }
 
-    const dateOfBirth = parseUkDobToIso(dob);
-    if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
+    if (!birthday) {
+      return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
     }
 
     const normalizedName = normalizeName(fullName);
     const existing = await prisma.admin.findUnique({
       where: {
-        organizationId_normalizedName_dateOfBirth: {
+        organizationId_normalizedName_birthMonth_birthYear: {
           organizationId: auth.session.organizationId,
           normalizedName,
-          dateOfBirth,
+          birthMonth: birthday.birthMonth,
+          birthYear: birthday.birthYear,
         },
       },
       select: { id: true },
@@ -71,13 +72,15 @@ export async function POST(request: Request) {
         organizationId: auth.session.organizationId,
         fullName,
         normalizedName,
-        dateOfBirth,
+        birthMonth: birthday.birthMonth,
+        birthYear: birthday.birthYear,
       },
       select: {
         id: true,
         organizationId: true,
         fullName: true,
-        dateOfBirth: true,
+        birthMonth: true,
+        birthYear: true,
       },
     });
 

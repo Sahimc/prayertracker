@@ -1,15 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession } from "@/lib/api-auth";
+import { parseBirthMonthYear } from "@/lib/birthdays";
+import { getTodayIso, isValidIsoDate } from "@/lib/dates";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
-import { isValidIsoDate, parseUkDobToIso } from "@/lib/dates";
 
 export const runtime = "nodejs";
 
 const DUPLICATE_STUDENT_MESSAGE =
-  "A student with this name and birthday already exists. Please add a surname or extra name.";
+  "A student with this name and birthday already exists in this class. Add the student's full name, or delete the old student if they no longer need access.";
 const DUPLICATE_CLASS_MESSAGE = "A class with this name already exists for this mosque.";
 const CLASS_REQUIRED_MESSAGE = "Choose a class or create a new class before adding a student.";
+
+const studentInclude = {
+  class: {
+    select: {
+      id: true,
+      organizationId: true,
+      name: true,
+    },
+  },
+  prayers: true,
+} as const;
 
 export async function GET(request: Request) {
   const auth = await requireApiSession({ role: "admin" });
@@ -38,13 +50,7 @@ export async function GET(request: Request) {
     const students = await prisma.student.findMany({
       where: { organizationId: auth.session.organizationId },
       include: {
-        class: {
-          select: {
-            id: true,
-            organizationId: true,
-            name: true,
-          },
-        },
+        class: studentInclude.class,
         prayers,
       },
       orderBy: { fullName: "asc" },
@@ -64,7 +70,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const fullName = cleanDisplayName(String(body.fullName ?? ""));
-    const dob = String(body.dob ?? "");
+    const birthday = parseBirthMonthYear(body.birthMonth, body.birthYear);
     const classId = String(body.classId ?? "");
     const newClassName = cleanDisplayName(String(body.newClassName ?? ""));
 
@@ -76,28 +82,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
     }
 
-    const dateOfBirth = parseUkDobToIso(dob);
-    if (!dateOfBirth) {
-      return NextResponse.json({ error: "Enter the birthday as DD/MM/YYYY" }, { status: 400 });
+    if (!birthday) {
+      return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
     }
 
     const normalizedName = normalizeName(fullName);
-    const existing = await prisma.student.findUnique({
-      where: {
-        organizationId_normalizedName_dateOfBirth: {
-          organizationId: auth.session.organizationId,
-          normalizedName,
-          dateOfBirth,
-        },
-      },
-      select: { id: true },
-    });
 
-    if (existing) {
-      return NextResponse.json({ error: DUPLICATE_STUDENT_MESSAGE }, { status: 400 });
-    }
-
-    const targetClassId = classId;
     if (newClassName) {
       const normalizedClassName = normalizeName(newClassName);
       const existingClass = await prisma.class.findUnique({
@@ -128,24 +118,29 @@ export async function POST(request: Request) {
           },
         });
 
-        const student = await tx.student.create({
+        const createdStudent = await tx.student.create({
           data: {
             organizationId: auth.session.organizationId,
             classId: studentClass.id,
             fullName,
             normalizedName,
-            dateOfBirth,
+            birthMonth: birthday.birthMonth,
+            birthYear: birthday.birthYear,
           },
-          include: {
-            class: {
-              select: {
-                id: true,
-                organizationId: true,
-                name: true,
-              },
-            },
-            prayers: true,
+          select: { id: true },
+        });
+
+        await tx.prayerLog.create({
+          data: {
+            organizationId: auth.session.organizationId,
+            studentId: createdStudent.id,
+            date: getTodayIso(),
           },
+        });
+
+        const student = await tx.student.findUniqueOrThrow({
+          where: { id: createdStudent.id },
+          include: studentInclude,
         });
 
         return { student, class: studentClass };
@@ -156,7 +151,7 @@ export async function POST(request: Request) {
 
     const existingClass = await prisma.class.findFirst({
       where: {
-        id: targetClassId,
+        id: classId,
         organizationId: auth.session.organizationId,
       },
       select: { id: true },
@@ -166,24 +161,48 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: CLASS_REQUIRED_MESSAGE }, { status: 400 });
     }
 
-    const student = await prisma.student.create({
-      data: {
-        organizationId: auth.session.organizationId,
-        classId: targetClassId,
-        fullName,
-        normalizedName,
-        dateOfBirth,
-      },
-      include: {
-        class: {
-          select: {
-            id: true,
-            organizationId: true,
-            name: true,
-          },
+    const existing = await prisma.student.findUnique({
+      where: {
+        organizationId_classId_normalizedName_birthMonth_birthYear: {
+          organizationId: auth.session.organizationId,
+          classId,
+          normalizedName,
+          birthMonth: birthday.birthMonth,
+          birthYear: birthday.birthYear,
         },
-        prayers: true,
       },
+      select: { id: true },
+    });
+
+    if (existing) {
+      return NextResponse.json({ error: DUPLICATE_STUDENT_MESSAGE }, { status: 400 });
+    }
+
+    const student = await prisma.$transaction(async (tx) => {
+      const createdStudent = await tx.student.create({
+        data: {
+          organizationId: auth.session.organizationId,
+          classId,
+          fullName,
+          normalizedName,
+          birthMonth: birthday.birthMonth,
+          birthYear: birthday.birthYear,
+        },
+        select: { id: true },
+      });
+
+      await tx.prayerLog.create({
+        data: {
+          organizationId: auth.session.organizationId,
+          studentId: createdStudent.id,
+          date: getTodayIso(),
+        },
+      });
+
+      return tx.student.findUniqueOrThrow({
+        where: { id: createdStudent.id },
+        include: studentInclude,
+      });
     });
 
     return NextResponse.json({ student }, { status: 201 });

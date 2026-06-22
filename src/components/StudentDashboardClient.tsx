@@ -4,7 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import styles from "@/app/dashboard/page.module.css";
-import { formatPrayerTime, formatUKDate, getCurrentWeekDates, getDayName, getFormatDate, isFutureDate } from "@/lib/dates";
+import {
+  formatPrayerTime,
+  formatUKDate,
+  getCurrentWeekDates,
+  getDayName,
+  getFormatDate,
+  getIsoFromDateTime,
+  isFutureDate,
+} from "@/lib/dates";
 import { calculatePointsFromLogs, PRAYER_LABELS, PRAYERS, RAKAAT_MAP } from "@/lib/prayers";
 import type { OrganizationSummary, PrayerLogSummary, PrayerTimeSummary, StudentSummary } from "@/lib/types";
 
@@ -145,6 +153,7 @@ export function StudentDashboardClient({
   const totalPoints = calculatePointsFromLogs(student.prayers);
   const firstName = student.fullName.split(" ")[0] || student.fullName;
   const currentPrayer = getCurrentPrayer(initialPrayerTime);
+  const studentStartDate = getIsoFromDateTime(student.createdAt);
 
   return (
     <div className={styles.container}>
@@ -214,6 +223,7 @@ export function StudentDashboardClient({
         <div className={styles.weekGrid}>
           {weekDates.days.map((dateStr) => {
             const isFuture = isFutureDate(dateStr, todayDateStr);
+            const isBeforeStudentStart = dateStr < studentStartDate;
             return (
               <div key={dateStr} className={styles.dayColumn}>
                 <div className={styles.dayName}>
@@ -223,15 +233,19 @@ export function StudentDashboardClient({
                 </div>
                 {PRAYERS.map((prayer) => {
                   const isPrayed = getPrayerStatus(dateStr, prayer);
-                  const isMissed = !isPrayed && !isFuture;
+                  const isMissed = !isPrayed && !isFuture && !isBeforeStudentStart;
                   return (
                     <button
                       key={`${dateStr}-${prayer}`}
-                      disabled={isFuture}
+                      disabled={isFuture || isBeforeStudentStart}
                       className={`${styles.smallPrayerBtn} ${
-                        isPrayed ? styles.prayed : isFuture ? styles.future : styles.missed
+                        isPrayed ? styles.prayed : isFuture || isBeforeStudentStart ? styles.future : styles.missed
                       }`}
-                      title={`${PRAYER_LABELS[prayer]} on ${dateStr}`}
+                      title={
+                        isBeforeStudentStart
+                          ? "Not tracked before this student was created"
+                          : `${PRAYER_LABELS[prayer]} on ${dateStr}`
+                      }
                       onClick={() => togglePrayer(dateStr, prayer)}
                     >
                       {PRAYER_LABELS[prayer]}
