@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StudentDashboardClient } from "@/components/StudentDashboardClient";
-import { getTodayIso } from "@/lib/dates";
 import { ensurePrayerLogsThroughToday } from "@/lib/prayer-history";
+import { ensureTodaysPrayerTime } from "@/lib/prayer-times";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import styles from "@/app/page.module.css";
@@ -17,7 +17,18 @@ export default async function StudentDashboardPage({ params }: StudentDashboardP
   const { mosqueSlug } = await params;
   const organization = await prisma.organization.findUnique({
     where: { slug: mosqueSlug },
-    select: { id: true, name: true, town: true, slug: true },
+    select: {
+      id: true,
+      name: true,
+      town: true,
+      slug: true,
+      prayerCity: true,
+      prayerCountry: true,
+      prayerTimezone: true,
+      prayerCalculationMethod: true,
+      prayerSchool: true,
+      prayerLatitudeAdjustmentMethod: true,
+    },
   });
 
   if (!organization) {
@@ -119,24 +130,7 @@ export default async function StudentDashboardPage({ params }: StudentDashboardP
     },
   });
 
-  const prayerTime = await prisma.prayerTime.findUnique({
-    where: {
-      organizationId_date: {
-        organizationId: organization.id,
-        date: getTodayIso(),
-      },
-    },
-    select: {
-      id: true,
-      organizationId: true,
-      date: true,
-      fajr: true,
-      dhuhr: true,
-      asr: true,
-      maghrib: true,
-      isha: true,
-    },
-  });
+  const prayerTime = await ensureTodaysPrayerTime(organization);
 
   return (
     <StudentDashboardClient

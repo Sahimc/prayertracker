@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireApiSession } from "@/lib/api-auth";
 import { fetchAladhanPrayerTimes, normalizePrayerSettings } from "@/lib/aladhan";
 import { getTodayIso } from "@/lib/dates";
+import { ensureTodaysPrayerTime, prayerSettingsFromOrganization } from "@/lib/prayer-times";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -14,14 +15,7 @@ function serializeSettings(organization: {
   prayerSchool: number;
   prayerLatitudeAdjustmentMethod: number;
 }) {
-  return {
-    city: organization.prayerCity,
-    country: organization.prayerCountry,
-    timezone: organization.prayerTimezone,
-    method: organization.prayerCalculationMethod,
-    school: organization.prayerSchool,
-    latitudeAdjustmentMethod: organization.prayerLatitudeAdjustmentMethod,
-  };
+  return prayerSettingsFromOrganization(organization);
 }
 
 export async function GET() {
@@ -32,6 +26,7 @@ export async function GET() {
     const organization = await prisma.organization.findUnique({
       where: { id: auth.session.organizationId },
       select: {
+        id: true,
         prayerCity: true,
         prayerCountry: true,
         prayerTimezone: true,
@@ -45,14 +40,7 @@ export async function GET() {
       return NextResponse.json({ error: "Mosque not found" }, { status: 404 });
     }
 
-    const prayerTime = await prisma.prayerTime.findUnique({
-      where: {
-        organizationId_date: {
-          organizationId: auth.session.organizationId,
-          date: getTodayIso(),
-        },
-      },
-    });
+    const prayerTime = await ensureTodaysPrayerTime(organization);
 
     return NextResponse.json({
       settings: serializeSettings(organization),

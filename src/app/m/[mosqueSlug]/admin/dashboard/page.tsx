@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminDashboardClient } from "@/components/AdminDashboardClient";
-import { getTodayIso } from "@/lib/dates";
 import { ensurePrayerLogsForStudents } from "@/lib/prayer-history";
+import { ensureTodaysPrayerTime } from "@/lib/prayer-times";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import styles from "@/app/page.module.css";
@@ -105,24 +105,7 @@ export default async function AdminDashboardPage({ params }: AdminDashboardPageP
       },
       orderBy: { name: "asc" },
     }),
-    prisma.prayerTime.findUnique({
-      where: {
-        organizationId_date: {
-          organizationId: organization.id,
-          date: getTodayIso(),
-        },
-      },
-      select: {
-        id: true,
-        organizationId: true,
-        date: true,
-        fajr: true,
-        dhuhr: true,
-        asr: true,
-        maghrib: true,
-        isha: true,
-      },
-    }),
+    ensureTodaysPrayerTime(organization),
   ]);
 
   await ensurePrayerLogsForStudents(students);

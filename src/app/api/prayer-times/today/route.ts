@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requireApiSession } from "@/lib/api-auth";
-import { getTodayIso } from "@/lib/dates";
+import { ensureTodaysPrayerTime } from "@/lib/prayer-times";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -10,14 +10,24 @@ export async function GET() {
   if (auth.response) return auth.response;
 
   try {
-    const prayerTime = await prisma.prayerTime.findUnique({
-      where: {
-        organizationId_date: {
-          organizationId: auth.session.organizationId,
-          date: getTodayIso(),
-        },
+    const organization = await prisma.organization.findUnique({
+      where: { id: auth.session.organizationId },
+      select: {
+        id: true,
+        prayerCity: true,
+        prayerCountry: true,
+        prayerTimezone: true,
+        prayerCalculationMethod: true,
+        prayerSchool: true,
+        prayerLatitudeAdjustmentMethod: true,
       },
     });
+
+    if (!organization) {
+      return NextResponse.json({ error: "Mosque not found" }, { status: 404 });
+    }
+
+    const prayerTime = await ensureTodaysPrayerTime(organization);
 
     return NextResponse.json({ prayerTime });
   } catch (error) {
