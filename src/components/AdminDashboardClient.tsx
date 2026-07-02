@@ -40,11 +40,6 @@ type StudentResponse = {
   error?: string;
 };
 
-type ClassResponse = {
-  class?: ClassSummary;
-  error?: string;
-};
-
 type PrayerResponse = {
   prayerLog?: PrayerLogSummary;
   error?: string;
@@ -96,7 +91,6 @@ export function AdminDashboardClient({
   const [students, setStudents] = useState(initialStudents);
   const [admins, setAdmins] = useState(initialAdmins);
   const [classes, setClasses] = useState(initialClasses);
-  const [newClassName, setNewClassName] = useState("");
   const [newFullName, setNewFullName] = useState("");
   const [newBirthMonth, setNewBirthMonth] = useState("");
   const [newBirthYear, setNewBirthYear] = useState("");
@@ -195,34 +189,6 @@ export function AdminDashboardClient({
 
       return [...currentClasses, nextClass].sort((a, b) => a.name.localeCompare(b.name));
     });
-  }
-
-  async function handleCreateClass(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-    setSuccess("");
-
-    try {
-      const response = await fetch("/api/classes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newClassName }),
-      });
-      const data = (await response.json()) as ClassResponse;
-
-      if (!response.ok || !data.class) {
-        throw new Error(data.error || "Failed to create class");
-      }
-
-      upsertClassInState(data.class);
-      setNewClassName("");
-      setNewStudentClassMode("existing");
-      setNewStudentClassId(data.class.id);
-      setClassFilterId(data.class.id);
-      setSuccess("Class created.");
-    } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "Failed to create class");
-    }
   }
 
   async function handleCreateStudent(event: React.FormEvent<HTMLFormElement>) {
@@ -868,6 +834,53 @@ export function AdminDashboardClient({
         </div>
       </div>
 
+      <section className={`glass-panel ${styles.classOverviewCard}`}>
+        <div className={styles.classOverviewHeader}>
+          <div>
+            <h2 className={styles.cardTitle}>Classes</h2>
+            <p className={styles.helperText}>Open a class to view every student&apos;s daily prayer record.</p>
+          </div>
+          <button
+            type="button"
+            className={styles.compactActionBtn}
+            onClick={() => {
+              setError("");
+              setSuccess("");
+              setShowAddStudentModal(true);
+              if (classes.length === 0) {
+                setNewStudentClassMode("new");
+                setNewStudentClassId("");
+              }
+            }}
+          >
+            Add Student
+          </button>
+        </div>
+        <div className={styles.classButtonGrid}>
+          {classes.map((studentClass) => {
+            const studentCount = classStudentCounts[studentClass.id] ?? 0;
+            return (
+              <Link
+                key={studentClass.id}
+                href={`/m/${mosqueSlug}/admin/class/${studentClass.id}`}
+                className={styles.classViewButton}
+              >
+                <span>
+                  <strong>{studentClass.name}</strong>
+                  <small>
+                    {studentCount} {studentCount === 1 ? "student" : "students"}
+                  </small>
+                </span>
+                <span className={styles.classViewCta}>View Class</span>
+              </Link>
+            );
+          })}
+          {classes.length === 0 && (
+            <p className={styles.classEmpty}>No classes yet. Add your first student to create one.</p>
+          )}
+        </div>
+      </section>
+
       <div className={`glass-panel ${styles.teacherReminderCard}`}>
         <div>
           <p className={styles.reminderEyebrow}>Daily teacher reminder</p>
@@ -895,42 +908,6 @@ export function AdminDashboardClient({
             >
               Add Student
             </button>
-          </div>
-
-          <div className={`glass-panel ${styles.card}`}>
-            <h2 className={styles.cardTitle}>Classes</h2>
-            <p className={styles.helperText}>Every student must belong to a class.</p>
-            <form className={styles.form} onSubmit={handleCreateClass}>
-              <input
-                type="text"
-                placeholder="Class name"
-                className={styles.input}
-                value={newClassName}
-                onChange={(event) => setNewClassName(event.target.value)}
-                required
-              />
-              <button type="submit" className={styles.submitBtn}>
-                Create New Class
-              </button>
-            </form>
-            <div className={styles.classList}>
-              {classes.map((studentClass) => {
-                const studentCount = classStudentCounts[studentClass.id] ?? 0;
-                return (
-                  <span key={studentClass.id} className={styles.classChip}>
-                    <strong>{studentClass.name}</strong>
-                    <small>
-                      {studentCount} {studentCount === 1 ? "student" : "students"}
-                    </small>
-                  </span>
-                );
-              })}
-              {classes.length === 0 && (
-                <p className={styles.classEmpty}>
-                  Create your first class here, or create it while adding the first student.
-                </p>
-              )}
-            </div>
           </div>
 
           <div className={`glass-panel ${styles.card}`}>

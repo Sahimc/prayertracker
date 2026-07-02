@@ -1,0 +1,386 @@
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  color: #86efac;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-top: 0.35rem;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+}
+
+.mosqueMeta {
+  color: var(--text-secondary);
+  margin-top: 0.45rem;
+  font-size: 0.95rem;
+}
+
+.backBtn,
+.closeBtn {
+  flex: 0 0 auto;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: var(--border-radius-sm);
+  background: rgba(59, 130, 246, 0.14);
+  color: #bfdbfe;
+  padding: 0.62rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.backBtn:hover,
+.closeBtn:hover {
+  background: rgba(59, 130, 246, 0.22);
+  color: white;
+}
+
+.statsCard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.statsCard > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  background: rgba(0, 0, 0, 0.16);
+  padding: 1rem;
+}
+
+.statValue {
+  color: var(--accent-primary);
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.statLabel {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.matrixCard,
+.emptyState {
+  padding: 1.25rem;
+}
+
+.emptyState {
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin-bottom: 0.5rem;
+}
+
+.emptyState p {
+  color: var(--text-secondary);
+}
+
+.matrixHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.matrixHeader h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.matrixHeader p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.todayBadge {
+  flex: 0 0 auto;
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #a7f3d0;
+  padding: 0.38rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.tableScroller {
+  overflow: auto;
+  max-height: calc(100dvh - 250px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  background: rgba(2, 6, 23, 0.34);
+}
+
+.matrixTable {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.matrixTable th,
+.matrixTable td {
+  border-right: 1px solid rgba(148, 163, 184, 0.14);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.stickyTop {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.stickyLeft {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: rgba(15, 23, 42, 0.98);
+}
+
+.cornerCell {
+  z-index: 4;
+}
+
+.dateHead {
+  min-width: 96px;
+  vertical-align: middle;
+}
+
+.dateHead span,
+.dateHead small {
+  display: block;
+}
+
+.dateHead span {
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.dateHead small {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  margin-top: 0.18rem;
+}
+
+.studentCell {
+  min-width: 210px;
+  max-width: 260px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.studentCell span,
+.studentCell small {
+  display: block;
+}
+
+.studentCell span {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.studentCell small {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  margin-top: 0.25rem;
+}
+
+.scoreButton {
+  width: 100%;
+  min-width: 68px;
+  min-height: 40px;
+  border-radius: var(--border-radius-sm);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.scoreButton:hover {
+  filter: brightness(1.08);
+}
+
+.completeCell {
+  border: 1px solid rgba(52, 211, 153, 0.58);
+  background: rgba(16, 185, 129, 0.88);
+}
+
+.partialCell {
+  border: 1px solid rgba(96, 165, 250, 0.58);
+  background: rgba(37, 99, 235, 0.78);
+}
+
+.missedCell {
+  border: 1px solid rgba(248, 113, 113, 0.42);
+  background: rgba(127, 29, 29, 0.72);
+}
+
+.notTrackedCell {
+  background: rgba(15, 23, 42, 0.28);
+}
+
+.notTrackedMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  min-height: 40px;
+  color: rgba(148, 163, 184, 0.58);
+  font-weight: 900;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.74);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.modalPanel {
+  width: min(100%, 460px);
+  border: 1px solid rgba(96, 165, 250, 0.34);
+  border-radius: var(--border-radius-md);
+  background:
+    linear-gradient(180deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98)),
+    var(--glass-bg);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.58);
+  padding: 1.25rem;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modalHeader h2 {
+  margin-top: 0.35rem;
+  font-size: 1.35rem;
+}
+
+.modalHeader p:not(.eyebrow) {
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.breakdownRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: var(--border-radius-sm);
+  padding: 0.75rem 0.85rem;
+}
+
+.breakdownRow span {
+  font-weight: 900;
+}
+
+.breakdownRow strong {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.breakdownPrayed {
+  border: 1px solid rgba(52, 211, 153, 0.38);
+  background: rgba(16, 185, 129, 0.16);
+  color: #d1fae5;
+}
+
+.breakdownMissed {
+  border: 1px solid rgba(248, 113, 113, 0.34);
+  background: rgba(127, 29, 29, 0.24);
+  color: #fee2e2;
+}
+
+@media (max-width: 800px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header,
+  .matrixHeader,
+  .modalHeader {
+    flex-direction: column;
+  }
+
+  .backBtn,
+  .closeBtn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .statsCard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 1rem;
+  }
+
+  .matrixCard,
+  .emptyState {
+    padding: 1rem;
+  }
+
+  .tableScroller {
+    max-height: calc(100dvh - 220px);
+  }
+
+  .studentCell {
+    min-width: 160px;
+    max-width: 190px;
+  }
+
+  .dateHead {
+    min-width: 86px;
+  }
+
+  .scoreButton,
+  .notTrackedMark {
+    min-width: 58px;
+  }
+}

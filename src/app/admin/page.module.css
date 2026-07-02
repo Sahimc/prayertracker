@@ -59,6 +59,99 @@
   margin-bottom: 1.5rem;
 }
 
+.classOverviewCard {
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.classOverviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.classOverviewHeader .cardTitle {
+  margin-bottom: 0.75rem;
+}
+
+.classOverviewHeader .helperText {
+  margin-bottom: 0;
+}
+
+.classButtonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.75rem;
+}
+
+.classViewButton {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid rgba(52, 211, 153, 0.24);
+  border-radius: var(--border-radius-sm);
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(59, 130, 246, 0.12)),
+    rgba(15, 23, 42, 0.42);
+  padding: 0.85rem 0.9rem;
+  color: var(--text-primary);
+}
+
+.classViewButton:hover {
+  border-color: rgba(52, 211, 153, 0.48);
+  transform: translateY(-1px);
+}
+
+.classViewButton span:first-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.classViewButton strong {
+  overflow-wrap: anywhere;
+  font-size: 0.98rem;
+}
+
+.classViewButton small {
+  color: #a7f3d0;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.classViewCta {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid rgba(96, 165, 250, 0.32);
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+  padding: 0.32rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.compactActionBtn {
+  flex: 0 0 auto;
+  border-radius: var(--border-radius-sm);
+  background: linear-gradient(135deg, #10b981, #22c55e 45%, #3b82f6);
+  color: white;
+  padding: 0.62rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 900;
+  box-shadow: 0 14px 28px rgba(16, 185, 129, 0.22);
+}
+
+.compactActionBtn:hover {
+  filter: brightness(1.05);
+}
+
 .teacherReminderCard {
   padding: 1.35rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -750,10 +843,24 @@
   }
 
   .summaryCard,
+  .classOverviewCard,
   .teacherReminderCard,
   .card,
   .studentCard {
     padding: 1rem;
+  }
+
+  .classOverviewHeader {
+    flex-direction: column;
+  }
+
+  .compactActionBtn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .classViewButton {
+    min-height: 76px;
   }
 
   .teacherReminderCard {
