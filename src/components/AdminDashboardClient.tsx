@@ -859,11 +859,17 @@ export function AdminDashboardClient({
         <div className={styles.classButtonGrid}>
           {classes.map((studentClass) => {
             const studentCount = classStudentCounts[studentClass.id] ?? 0;
+            const classHref = `/m/${mosqueSlug}/admin/class/${studentClass.id}`;
             return (
               <Link
                 key={studentClass.id}
-                href={`/m/${mosqueSlug}/admin/class/${studentClass.id}`}
+                href={classHref}
                 className={styles.classViewButton}
+                onClick={(event) => {
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                  event.preventDefault();
+                  window.location.assign(classHref);
+                }}
               >
                 <span>
                   <strong>{studentClass.name}</strong>
