@@ -895,22 +895,6 @@ export function AdminDashboardClient({
       <div className={styles.grid}>
         <div className={styles.sidebar}>
           <div className={`glass-panel ${styles.card}`}>
-            <h2 className={styles.cardTitle}>Add Student</h2>
-            <p className={styles.helperText}>Add a student when you need the form. Keep the dashboard easy to scan.</p>
-            <button
-              type="button"
-              className={styles.primaryActionBtn}
-              onClick={() => {
-                setError("");
-                setSuccess("");
-                setShowAddStudentModal(true);
-              }}
-            >
-              Add Student
-            </button>
-          </div>
-
-          <div className={`glass-panel ${styles.card}`}>
             <h2 className={styles.cardTitle}>Add Admin</h2>
             <p className={styles.helperText}>Admins can be teachers too.</p>
             <button
