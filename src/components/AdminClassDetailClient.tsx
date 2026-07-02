@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import styles from "./AdminClassDetailClient.module.css";
 import { formatBirthMonthYear } from "@/lib/birthdays";
 import { formatUKDate, getDateRange, getDayName, getIsoFromDateTime, getTodayIso } from "@/lib/dates";
-import { countCompletedPrayers, PRAYER_LABELS, PRAYERS } from "@/lib/prayers";
+import { countCompletedPrayers, PRAYER_LABELS, PRAYERS, type PrayerName } from "@/lib/prayers";
 import type { ClassSummary, OrganizationSummary, PrayerLogSummary, StudentSummary } from "@/lib/types";
 
 type AdminClassDetailClientProps = {
@@ -16,9 +16,13 @@ type AdminClassDetailClientProps = {
 };
 
 type SelectedCell = {
-  student: StudentSummary;
   date: string;
-  log: PrayerLogSummary;
+  studentId: string;
+};
+
+type PrayerUpdateResponse = {
+  prayerLog?: PrayerLogSummary;
+  error?: string;
 };
 
 function createEmptyPrayerLog(student: StudentSummary, date: string): PrayerLogSummary {
@@ -41,46 +45,110 @@ function getCellClass(total: number): string {
   return styles.missedCell;
 }
 
+function mergePrayerLog(students: StudentSummary[], studentId: string, prayerLog: PrayerLogSummary): StudentSummary[] {
+  return students.map((student) => {
+    if (student.id !== studentId) return student;
+
+    const hasExistingLog = student.prayers.some((log) => log.date === prayerLog.date);
+    const prayers = hasExistingLog
+      ? student.prayers.map((log) => (log.date === prayerLog.date ? prayerLog : log))
+      : [prayerLog, ...student.prayers];
+
+    return {
+      ...student,
+      prayers: prayers.sort((a, b) => b.date.localeCompare(a.date)),
+    };
+  });
+}
+
 export function AdminClassDetailClient({
   organization,
   studentClass,
   initialStudents,
   mosqueSlug,
 }: AdminClassDetailClientProps) {
+  const [students, setStudents] = useState<StudentSummary[]>(initialStudents);
   const [selectedCell, setSelectedCell] = useState<SelectedCell | null>(null);
+  const [savingPrayer, setSavingPrayer] = useState<PrayerName | null>(null);
+  const [modalError, setModalError] = useState("");
   const todayDateStr = getTodayIso();
 
   const studentStartDates = useMemo(() => {
-    return new Map(initialStudents.map((student) => [student.id, getIsoFromDateTime(student.createdAt)]));
-  }, [initialStudents]);
+    return new Map(students.map((student) => [student.id, getIsoFromDateTime(student.createdAt)]));
+  }, [students]);
 
   const dateColumns = useMemo(() => {
-    if (initialStudents.length === 0) return [];
+    if (students.length === 0) return [];
 
     const earliestStartDate = [...studentStartDates.values()].sort()[0];
     return getDateRange(earliestStartDate, todayDateStr).sort((a, b) => b.localeCompare(a));
-  }, [initialStudents.length, studentStartDates, todayDateStr]);
+  }, [students.length, studentStartDates, todayDateStr]);
 
   const logMaps = useMemo(() => {
     return new Map(
-      initialStudents.map((student) => [
+      students.map((student) => [
         student.id,
         new Map(student.prayers.map((log) => [log.date, log])),
       ]),
     );
-  }, [initialStudents]);
+  }, [students]);
 
   function getPrayerLog(student: StudentSummary, date: string): PrayerLogSummary {
     return logMaps.get(student.id)?.get(date) ?? createEmptyPrayerLog(student, date);
   }
 
-  const totalPossibleCells = initialStudents.reduce((total, student) => {
+  const selectedStudent = selectedCell ? students.find((student) => student.id === selectedCell.studentId) ?? null : null;
+  const selectedLog = selectedCell && selectedStudent ? getPrayerLog(selectedStudent, selectedCell.date) : null;
+
+  async function handlePrayerToggle(prayerName: PrayerName) {
+    if (!selectedCell || !selectedStudent || !selectedLog || savingPrayer) return;
+
+    const nextStatus = !selectedLog[prayerName];
+    const optimisticLog = {
+      ...selectedLog,
+      [prayerName]: nextStatus,
+    };
+    const previousStudents = students;
+
+    setModalError("");
+    setSavingPrayer(prayerName);
+    setStudents((currentStudents) => mergePrayerLog(currentStudents, selectedStudent.id, optimisticLog));
+
+    try {
+      const response = await fetch("/api/prayers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mosqueSlug,
+          studentId: selectedStudent.id,
+          date: selectedCell.date,
+          prayerName,
+          status: nextStatus,
+        }),
+      });
+
+      const data = (await response.json()) as PrayerUpdateResponse;
+      if (!response.ok || !data.prayerLog) {
+        throw new Error(data.error || "Prayer update failed");
+      }
+
+      const updatedPrayerLog = data.prayerLog;
+      setStudents((currentStudents) => mergePrayerLog(currentStudents, selectedStudent.id, updatedPrayerLog));
+    } catch (error) {
+      setStudents(previousStudents);
+      setModalError(error instanceof Error ? error.message : "Prayer update failed");
+    } finally {
+      setSavingPrayer(null);
+    }
+  }
+
+  const totalPossibleCells = students.reduce((total, student) => {
     const startDate = studentStartDates.get(student.id);
     if (!startDate) return total;
     return total + dateColumns.filter((date) => date >= startDate).length;
   }, 0);
 
-  const totalCompletedPrayers = initialStudents.reduce((total, student) => {
+  const totalCompletedPrayers = students.reduce((total, student) => {
     const startDate = studentStartDates.get(student.id);
     if (!startDate) return total;
 
@@ -97,8 +165,8 @@ export function AdminClassDetailClient({
           <p className={styles.eyebrow}>Class Register</p>
           <h1 className={`text-gradient ${styles.title}`}>{studentClass.name}</h1>
           <p className={styles.mosqueMeta}>
-            {organization.name} {"\u00b7"} {organization.town} {"\u00b7"} {initialStudents.length}{" "}
-            {initialStudents.length === 1 ? "student" : "students"}
+            {organization.name} {"\u00b7"} {organization.town} {"\u00b7"} {students.length}{" "}
+            {students.length === 1 ? "student" : "students"}
           </p>
         </div>
         <Link href={`/m/${mosqueSlug}/admin/dashboard`} className={styles.backBtn}>
@@ -108,7 +176,7 @@ export function AdminClassDetailClient({
 
       <div className={`glass-panel ${styles.statsCard}`}>
         <div>
-          <span className={styles.statValue}>{initialStudents.length}</span>
+          <span className={styles.statValue}>{students.length}</span>
           <span className={styles.statLabel}>Students</span>
         </div>
         <div>
@@ -125,7 +193,7 @@ export function AdminClassDetailClient({
         </div>
       </div>
 
-      {initialStudents.length === 0 ? (
+      {students.length === 0 ? (
         <div className={`glass-panel ${styles.emptyState}`}>
           <h2>No students in this class yet</h2>
           <p>Add a student from the dashboard and choose this class to start the register.</p>
@@ -153,7 +221,7 @@ export function AdminClassDetailClient({
                 </tr>
               </thead>
               <tbody>
-                {initialStudents.map((student) => {
+                {students.map((student) => {
                   const startDate = studentStartDates.get(student.id) ?? todayDateStr;
                   return (
                     <tr key={student.id}>
@@ -174,7 +242,10 @@ export function AdminClassDetailClient({
                               <button
                                 type="button"
                                 className={`${styles.scoreButton} ${getCellClass(total)}`}
-                                onClick={() => setSelectedCell({ student, date, log })}
+                                onClick={() => {
+                                  setSelectedCell({ studentId: student.id, date });
+                                  setModalError("");
+                                }}
                                 aria-label={`${student.fullName}, ${formatUKDate(date)}, ${total} out of ${PRAYERS.length} prayers`}
                               >
                                 {total}/{PRAYERS.length}
@@ -192,7 +263,7 @@ export function AdminClassDetailClient({
         </section>
       )}
 
-      {selectedCell && (
+      {selectedCell && selectedStudent && selectedLog && (
         <div className={styles.modalOverlay} role="presentation" onClick={() => setSelectedCell(null)}>
           <section
             className={styles.modalPanel}
@@ -204,23 +275,33 @@ export function AdminClassDetailClient({
             <div className={styles.modalHeader}>
               <div>
                 <p className={styles.eyebrow}>{formatUKDate(selectedCell.date)}</p>
-                <h2 id="class-prayer-breakdown-title">{selectedCell.student.fullName}</h2>
+                <h2 id="class-prayer-breakdown-title">{selectedStudent.fullName}</h2>
                 <p>
-                  {countCompletedPrayers(selectedCell.log)}/{PRAYERS.length} prayers completed
+                  {countCompletedPrayers(selectedLog)}/{PRAYERS.length} prayers completed
                 </p>
               </div>
               <button type="button" className={styles.closeBtn} onClick={() => setSelectedCell(null)}>
                 Close
               </button>
             </div>
+            {modalError && <p className={styles.modalError}>{modalError}</p>}
             <div className={styles.breakdownList}>
               {PRAYERS.map((prayer) => {
-                const prayed = selectedCell.log[prayer];
+                const prayed = selectedLog[prayer];
+                const isSavingThisPrayer = savingPrayer === prayer;
                 return (
-                  <div key={prayer} className={`${styles.breakdownRow} ${prayed ? styles.breakdownPrayed : styles.breakdownMissed}`}>
+                  <button
+                    key={prayer}
+                    type="button"
+                    className={`${styles.breakdownRow} ${prayed ? styles.breakdownPrayed : styles.breakdownMissed}`}
+                    onClick={() => handlePrayerToggle(prayer)}
+                    disabled={savingPrayer !== null}
+                    aria-pressed={prayed}
+                    aria-label={`${PRAYER_LABELS[prayer]} ${prayed ? "prayed" : "missed"} for ${selectedStudent.fullName} on ${formatUKDate(selectedCell.date)}`}
+                  >
                     <span>{PRAYER_LABELS[prayer]}</span>
-                    <strong>{prayed ? "Prayed" : "Missed"}</strong>
-                  </div>
+                    <strong>{isSavingThisPrayer ? "Saving..." : prayed ? "Prayed" : "Missed"}</strong>
+                  </button>
                 );
               })}
             </div>

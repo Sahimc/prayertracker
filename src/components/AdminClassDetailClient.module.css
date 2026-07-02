@@ -310,12 +310,25 @@
 }
 
 .breakdownRow {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   border-radius: var(--border-radius-sm);
   padding: 0.75rem 0.85rem;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.breakdownRow:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.breakdownRow:disabled {
+  cursor: wait;
+  opacity: 0.78;
 }
 
 .breakdownRow span {
@@ -337,6 +350,17 @@
   border: 1px solid rgba(248, 113, 113, 0.34);
   background: rgba(127, 29, 29, 0.24);
   color: #fee2e2;
+}
+
+.modalError {
+  border: 1px solid rgba(248, 113, 113, 0.34);
+  border-radius: var(--border-radius-sm);
+  background: rgba(127, 29, 29, 0.2);
+  color: #fecaca;
+  padding: 0.7rem 0.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.84rem;
+  font-weight: 800;
 }
 
 @media (max-width: 800px) {
