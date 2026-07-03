@@ -5,14 +5,34 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "@/app/page.module.css";
 import type { OrganizationSummary } from "@/lib/types";
 
-export function MosqueChooser() {
+type SuggestionReason = "session" | "single" | "recent";
+
+type MosqueChooserProps = {
+  initialOrganizations?: OrganizationSummary[];
+  suggestedOrganization?: OrganizationSummary | null;
+  suggestionReason?: SuggestionReason | null;
+};
+
+const SUGGESTION_LABELS: Record<SuggestionReason, string> = {
+  session: "You were already signed in here",
+  single: "Suggested mosque",
+  recent: "Based on your last visit",
+};
+
+export function MosqueChooser({
+  initialOrganizations,
+  suggestedOrganization = null,
+  suggestionReason = null,
+}: MosqueChooserProps) {
   const router = useRouter();
-  const [organizations, setOrganizations] = useState<OrganizationSummary[]>([]);
+  const [organizations, setOrganizations] = useState<OrganizationSummary[]>(initialOrganizations ?? []);
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialOrganizations);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (initialOrganizations) return;
+
     let isMounted = true;
 
     async function loadOrganizations() {
@@ -46,7 +66,7 @@ export function MosqueChooser() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialOrganizations]);
 
   const filteredOrganizations = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -57,28 +77,66 @@ export function MosqueChooser() {
     );
   }, [organizations, query]);
 
+  const listedOrganizations = useMemo(() => {
+    if (!suggestedOrganization || query.trim()) return filteredOrganizations;
+    return filteredOrganizations.filter((organization) => organization.id !== suggestedOrganization.id);
+  }, [filteredOrganizations, query, suggestedOrganization]);
+
+  async function chooseMosque(mosqueSlug: string) {
+    try {
+      await fetch("/api/preferences/mosque", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mosqueSlug }),
+      });
+    } finally {
+      router.push(`/m/${mosqueSlug}`);
+    }
+  }
+
   return (
     <main className={styles.homeContainer}>
       <div className={`glass-panel ${styles.loginCard}`}>
         <div>
-          <h1 className={`text-gradient ${styles.title}`}>Find your mosque</h1>
-          <p className={styles.subtitle}>Search for your mosque or madrasah to continue.</p>
+          <h1 className={`text-gradient ${styles.title}`}>
+            {suggestedOrganization ? "Continue to your mosque" : "Find your mosque"}
+          </h1>
+          <p className={styles.subtitle}>
+            {suggestedOrganization
+              ? "Use the mosque below, or search if you need a different one."
+              : "Search for your mosque or madrasah to continue."}
+          </p>
         </div>
 
         <div className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label className={styles.label} htmlFor="mosque-search">
-              Search
-            </label>
-            <input
-              id="mosque-search"
-              type="search"
-              className={styles.input}
-              placeholder="e.g. Green Lane Masjid"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </div>
+          {suggestedOrganization && suggestionReason && (
+            <button
+              type="button"
+              className={styles.suggestedMosqueCard}
+              onClick={() => chooseMosque(suggestedOrganization.slug)}
+            >
+              <span>{SUGGESTION_LABELS[suggestionReason]}</span>
+              <strong>{suggestedOrganization.name}</strong>
+              <small>{suggestedOrganization.town}</small>
+              <em>Continue</em>
+            </button>
+          )}
+
+          {(!suggestedOrganization || organizations.length > 1) && (
+            <div className={styles.inputGroup}>
+              <label className={styles.label} htmlFor="mosque-search">
+                {suggestedOrganization ? "Find another mosque" : "Find your mosque"}
+              </label>
+              <input
+                id="mosque-search"
+                type="search"
+                className={styles.input}
+                placeholder="e.g. Green Lane Masjid"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </div>
+          )}
 
           {loading && <p className={styles.muted}>Loading mosques...</p>}
           {error && <p className={styles.error}>{error}</p>}
@@ -91,14 +149,14 @@ export function MosqueChooser() {
             <p className={styles.muted}>No mosques match that search.</p>
           )}
 
-          {filteredOrganizations.length > 0 && (
+          {listedOrganizations.length > 0 && (
             <div className={styles.mosqueList}>
-              {filteredOrganizations.map((organization) => (
+              {listedOrganizations.map((organization) => (
                 <button
                   key={organization.id}
                   type="button"
                   className={styles.mosqueItem}
-                  onClick={() => router.push(`/m/${organization.slug}`)}
+                  onClick={() => chooseMosque(organization.slug)}
                 >
                   <span>{organization.name}</span>
                   <small>{organization.town}</small>

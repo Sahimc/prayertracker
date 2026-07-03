@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "@/app/page.module.css";
 import { BIRTH_MONTHS, cleanBirthYearInput } from "@/lib/birthdays";
 import type { OrganizationSummary } from "@/lib/types";
@@ -23,6 +23,14 @@ export function StudentLoginForm({ organization }: StudentLoginFormProps) {
   const [birthYear, setBirthYear] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    void fetch("/api/preferences/mosque", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mosqueSlug: organization.slug }),
+    }).catch(() => undefined);
+  }, [organization.slug]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -58,7 +66,7 @@ export function StudentLoginForm({ organization }: StudentLoginFormProps) {
     <main className={styles.container}>
       <div className={`glass-panel ${styles.loginCard}`}>
         <div>
-          <h1 className={`text-gradient ${styles.title}`}>Prayer Tracking</h1>
+          <h1 className={`text-gradient ${styles.title}`}>Student Login</h1>
           <p className={styles.mosqueTitle}>{organization.name}</p>
           <p className={styles.subtitle}>{organization.town}</p>
         </div>

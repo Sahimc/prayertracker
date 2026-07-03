@@ -12,7 +12,9 @@
 }
 
 .title {
-  font-size: 2rem;
+  font-size: clamp(2.1rem, 8vw, 3.2rem);
+  line-height: 0.98;
+  font-weight: 900;
 }
 
 .mosqueMeta {
@@ -22,14 +24,17 @@
 }
 
 .backBtn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: rgba(249, 115, 22, 0.16);
+  color: #ffedd5;
+  border: 1px solid rgba(251, 146, 60, 0.32);
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius-sm);
+  font-weight: 850;
 }
 
 .backBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(249, 115, 22, 0.24);
+  color: #fff7ed;
 }
 
 .statsCard {
@@ -49,7 +54,7 @@
 .statValue {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--accent-primary);
+  color: var(--accent-primary-soft);
 }
 
 .statLabel {
@@ -66,7 +71,7 @@
 }
 
 .lockNote {
-  color: #bfdbfe;
+  color: #ffedd5;
   font-size: 0.9rem;
   line-height: 1.5;
   margin: -0.75rem 0 1rem;
@@ -85,6 +90,8 @@
 .monthTitle {
   font-size: 1.15rem;
   margin-bottom: 0.9rem;
+  color: #fff7ed;
+  font-weight: 900;
 }
 
 .tableScroller {
@@ -104,7 +111,7 @@
 }
 
 .tableScroller::-webkit-scrollbar-thumb {
-  background: rgba(96, 165, 250, 0.62);
+  background: rgba(251, 146, 60, 0.72);
   border: 2px solid rgba(15, 23, 42, 0.72);
   border-radius: 999px;
 }
@@ -125,8 +132,8 @@
 }
 
 .historyTable th {
-  color: #bfdbfe;
-  background: rgba(15, 23, 42, 0.62);
+  color: #fed7aa;
+  background: rgba(124, 45, 18, 0.36);
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -138,7 +145,7 @@
 }
 
 .todayRow td {
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(249, 115, 22, 0.1);
 }
 
 .dateCell {

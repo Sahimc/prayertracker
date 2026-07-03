@@ -114,7 +114,7 @@ export function AdminDashboardClient({
   const [prayerTime, setPrayerTime] = useState(initialPrayerTime);
   const [prayerSettings, setPrayerSettings] = useState<PrayerSettingsSummary>(initialPrayerSettings);
   const [prayerSettingsLoading, setPrayerSettingsLoading] = useState(false);
-  const [showDailyReminder, setShowDailyReminder] = useState(true);
+  const [showDailyReminder, setShowDailyReminder] = useState(false);
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [studentPendingDelete, setStudentPendingDelete] = useState<{ id: string; name: string } | null>(null);

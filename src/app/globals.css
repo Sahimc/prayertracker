@@ -5,9 +5,11 @@
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-secondary: #cbd5e1;
   
-  --accent-primary: #3b82f6; /* Blue */
+  --accent-primary: #fb923c; /* Burning orange */
+  --accent-primary-strong: #f97316;
+  --accent-primary-soft: #fed7aa;
   --accent-success: #10b981; /* Green */
   --accent-danger: #ef4444; /* Red */
   --accent-warning: #f59e0b; /* Amber */
@@ -16,7 +18,8 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   
-  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-primary: linear-gradient(135deg, #fff7ed 0%, #fed7aa 24%, #fb923c 48%, #f97316 68%, #ef4444 100%);
+  --gradient-action: linear-gradient(135deg, #f97316 0%, #fb923c 46%, #facc15 100%);
   --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
   
@@ -56,7 +59,7 @@ a {
 }
 
 a:hover {
-  color: #60a5fa;
+  color: var(--accent-primary-soft);
 }
 
 /* Utilities */
@@ -70,10 +73,12 @@ a:hover {
 }
 
 .text-gradient {
+  color: var(--accent-primary-soft);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 0 30px rgba(249, 115, 22, 0.28);
 }
 
 /* Base button styles */

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "@/app/page.module.css";
 import { BIRTH_MONTHS, cleanBirthYearInput } from "@/lib/birthdays";
 import type { OrganizationSummary } from "@/lib/types";
@@ -23,6 +23,14 @@ export function AdminLoginForm({ organization }: AdminLoginFormProps) {
   const [birthYear, setBirthYear] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    void fetch("/api/preferences/mosque", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mosqueSlug: organization.slug }),
+    }).catch(() => undefined);
+  }, [organization.slug]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

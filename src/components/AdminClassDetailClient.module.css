@@ -13,7 +13,7 @@
 }
 
 .eyebrow {
-  color: #86efac;
+  color: #fed7aa;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -23,6 +23,8 @@
 .title {
   margin-top: 0.35rem;
   font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 0.98;
+  font-weight: 900;
 }
 
 .mosqueMeta {
@@ -34,10 +36,10 @@
 .backBtn,
 .closeBtn {
   flex: 0 0 auto;
-  border: 1px solid rgba(96, 165, 250, 0.28);
+  border: 1px solid rgba(251, 146, 60, 0.32);
   border-radius: var(--border-radius-sm);
-  background: rgba(59, 130, 246, 0.14);
-  color: #bfdbfe;
+  background: rgba(249, 115, 22, 0.16);
+  color: #ffedd5;
   padding: 0.62rem 0.9rem;
   font-size: 0.85rem;
   font-weight: 800;
@@ -45,8 +47,8 @@
 
 .backBtn:hover,
 .closeBtn:hover {
-  background: rgba(59, 130, 246, 0.22);
-  color: white;
+  background: rgba(249, 115, 22, 0.24);
+  color: #fff7ed;
 }
 
 .statsCard {
@@ -68,7 +70,7 @@
 }
 
 .statValue {
-  color: var(--accent-primary);
+  color: var(--accent-primary-soft);
   font-size: 1.5rem;
   font-weight: 900;
 }
@@ -92,6 +94,7 @@
 
 .emptyState h2 {
   margin-bottom: 0.5rem;
+  color: #fff7ed;
 }
 
 .emptyState p {
@@ -109,6 +112,8 @@
 .matrixHeader h2 {
   font-size: 1.25rem;
   margin-bottom: 0.35rem;
+  color: #fff7ed;
+  font-weight: 900;
 }
 
 .matrixHeader p {
@@ -118,10 +123,10 @@
 
 .todayBadge {
   flex: 0 0 auto;
-  border: 1px solid rgba(52, 211, 153, 0.28);
+  border: 1px solid rgba(251, 146, 60, 0.32);
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.12);
-  color: #a7f3d0;
+  background: rgba(249, 115, 22, 0.16);
+  color: #ffedd5;
   padding: 0.38rem 0.7rem;
   font-size: 0.78rem;
   font-weight: 900;
@@ -155,7 +160,7 @@
   position: sticky;
   top: 0;
   z-index: 3;
-  background: rgba(15, 23, 42, 0.98);
+  background: rgba(124, 45, 18, 0.98);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -182,7 +187,7 @@
 }
 
 .dateHead span {
-  color: var(--text-primary);
+  color: #fff7ed;
   font-size: 0.78rem;
   font-weight: 900;
 }
@@ -238,8 +243,8 @@
 }
 
 .partialCell {
-  border: 1px solid rgba(96, 165, 250, 0.58);
-  background: rgba(37, 99, 235, 0.78);
+  border: 1px solid rgba(251, 146, 60, 0.58);
+  background: rgba(249, 115, 22, 0.78);
 }
 
 .missedCell {
@@ -276,7 +281,7 @@
 
 .modalPanel {
   width: min(100%, 460px);
-  border: 1px solid rgba(96, 165, 250, 0.34);
+  border: 1px solid rgba(251, 146, 60, 0.34);
   border-radius: var(--border-radius-md);
   background:
     linear-gradient(180deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98)),
@@ -296,6 +301,8 @@
 .modalHeader h2 {
   margin-top: 0.35rem;
   font-size: 1.35rem;
+  color: #fff7ed;
+  font-weight: 900;
 }
 
 .modalHeader p:not(.eyebrow) {

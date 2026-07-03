@@ -11,13 +11,17 @@
 .backLink {
   display: inline-flex;
   margin-bottom: 1.25rem;
-  color: #bfdbfe;
+  color: #fed7aa;
   font-size: 0.88rem;
   font-weight: 800;
 }
 
+.backLink:hover {
+  color: #fff7ed;
+}
+
 .eyebrow {
-  color: #67e8f9;
+  color: #fed7aa;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -26,18 +30,19 @@
 }
 
 .card h1 {
-  color: var(--text-primary);
+  color: #fff7ed;
   font-size: clamp(2rem, 8vw, 3.4rem);
   line-height: 0.98;
   margin-bottom: 1rem;
+  font-weight: 900;
 }
 
 .acceptance {
   padding: 1rem;
-  border: 1px solid rgba(45, 212, 191, 0.34);
+  border: 1px solid rgba(251, 146, 60, 0.38);
   border-radius: var(--border-radius-md);
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.16), rgba(14, 165, 233, 0.1));
-  color: #e0f2fe;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(15, 23, 42, 0.46));
+  color: #ffedd5;
   font-size: 1rem;
   font-weight: 800;
   line-height: 1.55;
@@ -62,9 +67,10 @@
 }
 
 .termSection h2 {
-  color: var(--text-primary);
+  color: #fff7ed;
   font-size: 1.05rem;
   margin-bottom: 0.45rem;
+  font-weight: 900;
 }
 
 .termSection p {

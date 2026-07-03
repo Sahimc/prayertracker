@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import type { Role } from "./types";
 
 export const SESSION_COOKIE_NAME = "prayer_tracker_session";
+export const LAST_MOSQUE_COOKIE_NAME = "prayer_tracker_last_mosque";
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+const LAST_MOSQUE_DURATION_SECONDS = 180 * 24 * 60 * 60;
 
 export type SessionPayload = {
   role: Role;
@@ -79,6 +81,14 @@ export async function createSession(input: SessionInput): Promise<void> {
     expires: expiresAt,
     path: "/",
   });
+
+  cookieStore.set(LAST_MOSQUE_COOKIE_NAME, input.mosqueSlug, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: LAST_MOSQUE_DURATION_SECONDS,
+    path: "/",
+  });
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
@@ -90,6 +100,22 @@ export async function getSession(): Promise<SessionPayload | null> {
 export async function clearSession(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);
+}
+
+export async function rememberMosque(mosqueSlug: string): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.set(LAST_MOSQUE_COOKIE_NAME, mosqueSlug, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: LAST_MOSQUE_DURATION_SECONDS,
+    path: "/",
+  });
+}
+
+export async function getRememberedMosqueSlug(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get(LAST_MOSQUE_COOKIE_NAME)?.value ?? null;
 }
 
 export function sessionMatchesMosque(session: SessionPayload | null, mosqueSlug: string): boolean {
