@@ -17,6 +17,7 @@
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   
   --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-title-fire: linear-gradient(135deg, #fff7ed 0%, #fed7aa 18%, #fb923c 42%, #f97316 68%, #dc2626 100%);
   --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   --gradient-danger: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
   
@@ -70,7 +71,7 @@ a:hover {
 }
 
 .text-gradient {
-  background: var(--gradient-primary);
+  background: var(--gradient-title-fire);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

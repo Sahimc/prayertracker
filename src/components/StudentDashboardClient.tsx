@@ -152,6 +152,8 @@ export function StudentDashboardClient({
 
   const totalPoints = calculatePointsFromLogs(student.prayers);
   const firstName = student.fullName.split(" ")[0] || student.fullName;
+  const titleLengthClass =
+    firstName.length >= 12 ? styles.titleLong : firstName.length >= 9 ? styles.titleMedium : "";
   const currentPrayer = getCurrentPrayer(initialPrayerTime);
   const studentStartDate = getIsoFromDateTime(student.createdAt);
 
@@ -159,7 +161,9 @@ export function StudentDashboardClient({
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1 className={`text-gradient ${styles.title}`}>Salaam, {firstName}</h1>
+          <h1 className={["text-gradient", styles.title, titleLengthClass].filter(Boolean).join(" ")}>
+            Salaam, {firstName}
+          </h1>
           <p className={styles.mosqueMeta}>
             {organization.name} {"\u00b7"} {organization.town} {"\u00b7"} {student.class.name}
           </p>
@@ -189,12 +193,12 @@ export function StudentDashboardClient({
                   onClick={() => togglePrayer(todayDateStr, prayer)}
                   aria-label={`${PRAYER_LABELS[prayer]}${isCurrentPrayer ? " current prayer" : ""}`}
                 >
+                  {isCurrentPrayer && <div className={styles.nowBadge}>Now</div>}
                   <div className={styles.prayerName}>{PRAYER_LABELS[prayer]}</div>
                   <div className={styles.rakaatPill}>{RAKAAT_MAP[prayer]}</div>
                 </button>
                 {prayerTime && (
                   <span className={`${styles.timePill} ${isCurrentPrayer ? styles.currentTimePill : ""}`}>
-                    {isCurrentPrayer && <span className={styles.nowLabel}>Now</span>}
                     {prayerTime}
                   </span>
                 )}
