@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/session";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
-import { parseBirthMonthYear } from "@/lib/birthdays";
+import { parseBirthMonthYear, isAtLeast18 } from "@/lib/birthdays";
 import { generateUniqueMosqueSlug } from "@/lib/slugs";
 
 export const runtime = "nodejs";
@@ -48,6 +48,10 @@ export async function POST(request: Request) {
 
     if (!birthday) {
       return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
+    }
+
+    if (!isAtLeast18(birthday.birthMonth, birthday.birthYear)) {
+      return NextResponse.json({ error: "Apologies, this account could not be created." }, { status: 400 });
     }
 
     const slug = await generateUniqueMosqueSlug(mosqueName, town, async (candidate) => {

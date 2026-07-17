@@ -37,3 +37,15 @@ export function formatBirthMonthYear(birthMonth: number, birthYear: number): str
   const month = BIRTH_MONTHS.find((option) => option.value === birthMonth);
   return `${month?.label ?? birthMonth} ${birthYear}`;
 }
+
+export function isAtLeast18(birthMonth: number, birthYear: number): boolean {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // getMonth() is 0-indexed
+
+  const age = currentYear - birthYear;
+  if (age > 18) return true;
+  if (age === 18) return currentMonth >= birthMonth;
+  return false;
+}
+

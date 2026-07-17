@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSession } from "@/lib/api-auth";
-import { parseBirthMonthYear } from "@/lib/birthdays";
+import { parseBirthMonthYear, isAtLeast18 } from "@/lib/birthdays";
 import { cleanDisplayName, normalizeName } from "@/lib/names";
 import { prisma } from "@/lib/prisma";
 
@@ -48,6 +48,10 @@ export async function POST(request: Request) {
 
     if (!birthday) {
       return NextResponse.json({ error: "Choose a birthday month and year." }, { status: 400 });
+    }
+
+    if (!isAtLeast18(birthday.birthMonth, birthday.birthYear)) {
+      return NextResponse.json({ error: "Apologies, this account could not be created." }, { status: 400 });
     }
 
     const normalizedName = normalizeName(fullName);
